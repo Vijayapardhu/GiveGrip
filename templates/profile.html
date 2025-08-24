@@ -1,0 +1,703 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Give Grip{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar">
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Picture" id="profile-avatar-img">
+                    <div class="avatar-overlay">
+                        <button class="avatar-upload-btn" id="avatar-upload-btn" title="Change Profile Picture">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p class="profile-email">{{ user.email }}</p>
+                <p class="profile-joined">Member since {{ user.date_joined|date:"F Y" }}</p>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-donations">0</span>
+                        <span class="stat-label">Total Donations</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-amount">$0</span>
+                        <span class="stat-label">Total Amount</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="campaigns-created">0</span>
+                        <span class="stat-label">Campaigns Created</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <div class="profile-tabs">
+                <button class="tab-btn active" data-tab="personal">Personal Information</button>
+                <button class="tab-btn" data-tab="security">Security</button>
+                <button class="tab-btn" data-tab="notifications">Notifications</button>
+                <button class="tab-btn" data-tab="privacy">Privacy</button>
+            </div>
+
+            <!-- Personal Information Tab -->
+            <div class="tab-content active" id="personal">
+                <div class="profile-card">
+                    <h3>Personal Information</h3>
+                    <form class="profile-form" id="personal-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name">First Name</label>
+                                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" placeholder="City, Country">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="url" id="website" name="website" placeholder="https://example.com">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="tab-content" id="security">
+                <div class="profile-card">
+                    <h3>Change Password</h3>
+                    <form class="profile-form" id="password-form">
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <div class="password-input">
+                                <input type="password" id="current_password" name="current_password" required>
+                                <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <div class="password-input">
+                                <input type="password" id="new_password" name="new_password" required>
+                                <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strength-fill"></div>
+                                </div>
+                                <span class="strength-text" id="strength-text">Password strength</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_new_password">Confirm New Password</label>
+                            <div class="password-input">
+                                <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+                                <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+
+                    <div class="security-section">
+                        <h4>Two-Factor Authentication</h4>
+                        <p>Add an extra layer of security to your account.</p>
+                        <button class="btn btn-outline" id="enable-2fa">Enable 2FA</button>
+                    </div>
+
+                    <div class="security-section">
+                        <h4>Login Sessions</h4>
+                        <p>Manage your active login sessions across devices.</p>
+                        <button class="btn btn-outline" id="view-sessions">View Sessions</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div class="tab-content" id="notifications">
+                <div class="profile-card">
+                    <h3>Notification Preferences</h3>
+                    <form class="profile-form" id="notifications-form">
+                        <div class="notification-group">
+                            <h4>Email Notifications</h4>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="email_donations" checked>
+                                <span class="checkmark"></span>
+                                Donation confirmations and receipts
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="email_campaigns" checked>
+                                <span class="checkmark"></span>
+                                Campaign updates and milestones
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="email_newsletter">
+                                <span class="checkmark"></span>
+                                Newsletter and updates
+                            </label>
+                        </div>
+
+                        <div class="notification-group">
+                            <h4>Push Notifications</h4>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="push_donations" checked>
+                                <span class="checkmark"></span>
+                                Donation confirmations
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="push_campaigns" checked>
+                                <span class="checkmark"></span>
+                                Campaign updates
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Preferences</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Privacy Tab -->
+            <div class="tab-content" id="privacy">
+                <div class="profile-card">
+                    <h3>Privacy Settings</h3>
+                    <form class="profile-form" id="privacy-form">
+                        <div class="privacy-group">
+                            <h4>Profile Visibility</h4>
+                            <label class="radio-label">
+                                <input type="radio" name="profile_visibility" value="public" checked>
+                                <span class="radio-checkmark"></span>
+                                Public - Anyone can view my profile
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="profile_visibility" value="donors">
+                                <span class="radio-checkmark"></span>
+                                Donors only - Only people I've donated to can view my profile
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="profile_visibility" value="private">
+                                <span class="radio-checkmark"></span>
+                                Private - Only I can view my profile
+                            </label>
+                        </div>
+
+                        <div class="privacy-group">
+                            <h4>Donation History</h4>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="show_donations" checked>
+                                <span class="checkmark"></span>
+                                Show my donations on my profile
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="show_amounts">
+                                <span class="checkmark"></span>
+                                Show donation amounts publicly
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Privacy Settings</button>
+                    </form>
+
+                    <div class="privacy-section">
+                        <h4>Data Export</h4>
+                        <p>Download a copy of your personal data.</p>
+                        <button class="btn btn-outline" id="export-data">Export Data</button>
+                    </div>
+
+                    <div class="privacy-section">
+                        <h4>Account Deletion</h4>
+                        <p>Permanently delete your account and all associated data.</p>
+                        <button class="btn btn-danger" id="delete-account">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Remove active class from all tabs and contents
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.getElementById(targetTab).classList.add('active');
+        });
+    });
+
+    // Avatar upload functionality
+    const avatarUploadBtn = document.getElementById('avatar-upload-btn');
+    const avatarInput = document.getElementById('avatar-input');
+    const avatarImg = document.getElementById('profile-avatar-img');
+
+    avatarUploadBtn.addEventListener('click', function() {
+        avatarInput.click();
+    });
+
+    avatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Password strength checker
+    const newPasswordInput = document.getElementById('new_password');
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = checkPasswordStrength(password);
+            updatePasswordStrength(strength);
+        });
+    }
+
+    function checkPasswordStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        return score;
+    }
+
+    function updatePasswordStrength(strength) {
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthText = document.getElementById('strength-text');
+        
+        if (strengthFill && strengthText) {
+            strengthFill.style.width = (strength * 20) + '%';
+            
+            if (strength <= 1) {
+                strengthFill.className = 'strength-fill weak';
+                strengthText.textContent = 'Weak';
+            } else if (strength <= 3) {
+                strengthFill.className = 'strength-fill medium';
+                strengthText.textContent = 'Medium';
+            } else {
+                strengthFill.className = 'strength-fill strong';
+                strengthText.textContent = 'Strong';
+            }
+        }
+    }
+
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+    });
+
+    // Form submissions
+    const personalForm = document.getElementById('personal-form');
+    if (personalForm) {
+        personalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Handle form submission
+            console.log('Personal information updated');
+        });
+    }
+
+    const passwordForm = document.getElementById('password-form');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_new_password').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Handle password change
+            console.log('Password changed');
+        });
+    }
+
+    // Load profile stats (simulated)
+    loadProfileStats();
+});
+
+function loadProfileStats() {
+    // Simulate loading profile statistics
+    document.getElementById('total-donations').textContent = '12';
+    document.getElementById('total-amount').textContent = '$1,250';
+    document.getElementById('campaigns-created').textContent = '3';
+}
+</script>
+{% endblock %}
+<!-- Profile Content -->
+<section class="section">
+    <div class="container">
+        <div class="profile-layout">
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <nav class="profile-nav">
+                    <a href="#profile" class="nav-item active" data-tab="profile">
+                        <i class="fas fa-user"></i>
+                        Profile Information
+                    </a>
+                    <a href="#donations" class="nav-item" data-tab="donations">
+                        <i class="fas fa-heart"></i>
+                        My Donations
+                    </a>
+                    <a href="#campaigns" class="nav-item" data-tab="campaigns">
+                        <i class="fas fa-bullseye"></i>
+                        My Campaigns
+                    </a>
+                    <a href="#payment-methods" class="nav-item" data-tab="payment-methods">
+                        <i class="fas fa-credit-card"></i>
+                        Payment Methods
+                    </a>
+                    <a href="#notifications" class="nav-item" data-tab="notifications">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </a>
+                    <a href="#security" class="nav-item" data-tab="security">
+                        <i class="fas fa-shield-alt"></i>
+                        Security
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="profile-main">
+                <!-- Profile Information Tab -->
+                <div class="tab-content active" id="profile-tab">
+                    <div class="tab-header">
+                        <h2>Profile Information</h2>
+                        <p>Manage your personal information and preferences</p>
+                    </div>
+                    
+                    <form class="profile-form" id="profile-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First Name</label>
+                                <input type="text" id="first-name" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name</label>
+                                <input type="text" id="last-name" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" required readonly>
+                            <small class="form-help">Email cannot be changed. Contact support if needed.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" placeholder="City, Country">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="url" id="website" name="website" placeholder="https://example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Privacy Settings</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="public_profile" checked>
+                                    <span class="checkmark"></span>
+                                    Make my profile public
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="show_donations" checked>
+                                    <span class="checkmark"></span>
+                                    Show my donations on campaigns
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="email_notifications">
+                                    <span class="checkmark"></span>
+                                    Receive email notifications
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Save Changes
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="resetForm()">
+                                <i class="fas fa-undo"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Donations Tab -->
+                <div class="tab-content" id="donations-tab">
+                    <div class="tab-header">
+                        <h2>My Donations</h2>
+                        <p>Track your giving history and impact</p>
+                    </div>
+                    
+                    <div class="donations-summary">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3>Total Impact</h3>
+                                <div class="summary-stats">
+                                    <div class="summary-stat">
+                                        <span class="stat-value" id="total-donations-count">0</span>
+                                        <span class="stat-label">Donations</span>
+                                    </div>
+                                    <div class="summary-stat">
+                                        <span class="stat-value" id="total-donations-amount">$0</span>
+                                        <span class="stat-label">Amount</span>
+                                    </div>
+                                    <div class="summary-stat">
+                                        <span class="stat-value" id="campaigns-supported-count">0</span>
+                                        <span class="stat-label">Campaigns</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="donations-list" id="donations-list">
+                        <!-- Donations will be loaded here -->
+                        <div class="loading-placeholder">
+                            <div class="spinner"></div>
+                            <p>Loading your donations...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campaigns Tab -->
+                <div class="tab-content" id="campaigns-tab">
+                    <div class="tab-header">
+                        <h2>My Campaigns</h2>
+                        <p>Manage campaigns you've created</p>
+                    </div>
+                    
+                    <div class="campaigns-actions">
+                        <a href="{% url 'create_campaign' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create New Campaign
+                        </a>
+                    </div>
+                    
+                    <div class="campaigns-list" id="campaigns-list">
+                        <!-- Campaigns will be loaded here -->
+                        <div class="loading-placeholder">
+                            <div class="spinner"></div>
+                            <p>Loading your campaigns...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Methods Tab -->
+                <div class="tab-content" id="payment-methods-tab">
+                    <div class="tab-header">
+                        <h2>Payment Methods</h2>
+                        <p>Manage your saved payment methods</p>
+                    </div>
+                    
+                    <div class="payment-methods-list" id="payment-methods-list">
+                        <div class="payment-method-card">
+                            <div class="payment-method-info">
+                                <div class="payment-method-icon">
+                                    <i class="fab fa-cc-visa"></i>
+                                </div>
+                                <div class="payment-method-details">
+                                    <h4>Visa ending in 4242</h4>
+                                    <p>Expires 12/25</p>
+                                </div>
+                            </div>
+                            <div class="payment-method-actions">
+                                <button class="btn btn-outline btn-sm">Edit</button>
+                                <button class="btn btn-outline btn-sm text-error">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="addPaymentMethod()">
+                            <i class="fas fa-plus"></i>
+                            Add Payment Method
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notifications Tab -->
+                <div class="tab-content" id="notifications-tab">
+                    <div class="tab-header">
+                        <h2>Notification Preferences</h2>
+                        <p>Choose how and when you want to be notified</p>
+                    </div>
+                    
+                    <form class="notifications-form">
+                        <div class="notification-section">
+                            <h3>Email Notifications</h3>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="email_donations" checked>
+                                    <span class="checkmark"></span>
+                                    Donation confirmations
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="email_campaigns" checked>
+                                    <span class="checkmark"></span>
+                                    Campaign updates
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="email_newsletter">
+                                    <span class="checkmark"></span>
+                                    Newsletter and updates
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-section">
+                            <h3>Push Notifications</h3>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="push_donations" checked>
+                                    <span class="checkmark"></span>
+                                    Donation confirmations
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="push_campaigns">
+                                    <span class="checkmark"></span>
+                                    Campaign updates
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="push_reminders">
+                                    <span class="checkmark"></span>
+                                    Reminders and tips
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Preferences</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Security Tab -->
+                <div class="tab-content" id="security-tab">
+                    <div class="tab-header">
+                        <h2>Security Settings</h2>
+                        <p>Manage your account security</p>
+                    </div>
+                    
+                    <div class="security-sections">
+                        <div class="security-section">
+                            <h3>Change Password</h3>
+                            <form class="password-form">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" id="current-password" name="current_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" id="new-password" name="new_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm New Password</label>
+                                    <input type="password" id="confirm-password" name="confirm_password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </form>
+                        </div>
+                        
+                        <div class="security-section">
+                            <h3>Two-Factor Authentication</h3>
+                            <p>Add an extra layer of security to your account</p>
+                            <button class="btn btn-outline">Enable 2FA</button>
+                        </div>
+                        
+                        <div class="security-section">
+                            <h3>Login Sessions</h3>
+                            <p>Manage your active login sessions</p>
+                            <button class="btn btn-outline">View Sessions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

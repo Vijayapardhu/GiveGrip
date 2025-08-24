@@ -1,0 +1,1 @@
+# Give Grip Django Project

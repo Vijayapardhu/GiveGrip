@@ -1,0 +1,839 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign Up" %} - Give Grip{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>{% trans "Join Give Grip" %}</h1>
+            <p>{% trans "Create your account and start making a difference today" %}</p>
+        </div>
+
+        {% get_providers as socialaccount_providers %}
+        
+        {% if socialaccount_providers %}
+        <div class="social-login-section">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-google" title="Continue with Google">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                {% trans "Continue with Google" %}
+            </a>
+            
+            <div class="divider">
+                <span>{% trans "or" %}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="alert alert-error">
+            <h3>{% trans "Please correct the following errors:" %}</h3>
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form class="signup-form" method="POST" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">{% trans "First Name" %}</label>
+                    <input type="text" 
+                           name="{{ form.first_name.name }}" 
+                           id="{{ form.first_name.id_for_label }}"
+                           value="{{ form.first_name.value|default:'' }}"
+                           class="form-control {% if form.first_name.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your first name' %}"
+                           required>
+                    {% if form.first_name.errors %}
+                    <div class="error-message">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">{% trans "Last Name" %}</label>
+                    <input type="text" 
+                           name="{{ form.last_name.name }}" 
+                           id="{{ form.last_name.id_for_label }}"
+                           value="{{ form.last_name.value|default:'' }}"
+                           class="form-control {% if form.last_name.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your last name' %}"
+                           required>
+                    {% if form.last_name.errors %}
+                    <div class="error-message">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{% trans "Email Address" %}</label>
+                <input type="email" 
+                       name="{{ form.email.name }}" 
+                       id="{{ form.email.id_for_label }}"
+                       value="{{ form.email.value|default:'' }}"
+                       class="form-control {% if form.email.errors %}error{% endif %}"
+                       placeholder="{% trans 'Enter your email address' %}"
+                       required>
+                {% if form.email.errors %}
+                <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.phone_number.id_for_label }}">{% trans "Phone Number (Optional)" %}</label>
+                <div class="phone-input-group">
+                                            <select id="countryCode" class="country-code" title="Country Code">
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                            <option value="+86">+86</option>
+                            <option value="+81">+81</option>
+                        </select>
+                    <input type="tel" 
+                           name="{{ form.phone_number.name }}" 
+                           id="{{ form.phone_number.id_for_label }}"
+                           value="{{ form.phone_number.value|default:'' }}"
+                           class="form-control {% if form.phone_number.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your phone number' %}"
+                           maxlength="15">
+                </div>
+                {% if form.phone_number.errors %}
+                <div class="error-message">{{ form.phone_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">{% trans "Password" %}</label>
+                <div class="password-input-group">
+                    <input type="password" 
+                           name="{{ form.password1.name }}" 
+                           id="{{ form.password1.id_for_label }}"
+                           class="form-control {% if form.password1.errors %}error{% endif %}"
+                           placeholder="{% trans 'Create a strong password' %}"
+                           required>
+                    <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                        <svg class="eye-slash-icon" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                <div class="error-message">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Password Strength Indicator -->
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <span class="strength-text" id="strengthText">{% trans "Password strength" %}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">{% trans "Confirm Password" %}</label>
+                <div class="password-input-group">
+                    <input type="password" 
+                           name="{{ form.password2.name }}" 
+                           id="{{ form.password2.id_for_label }}"
+                           class="form-control {% if form.password2.errors %}error{% endif %}"
+                           placeholder="{% trans 'Confirm your password' %}"
+                           required>
+                    <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                        <svg class="eye-slash-icon" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                <div class="error-message">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <span class="checkmark"></span>
+                    {% trans "I agree to the" %} <a href="{% url 'terms_of_service' %}" target="_blank">{% trans "Terms of Service" %}</a> {% trans "and" %} <a href="{% url 'privacy_policy' %}" target="_blank">{% trans "Privacy Policy" %}</a>
+                </label>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" name="newsletter" id="newsletter">
+                    <span class="checkmark"></span>
+                    {% trans "Subscribe to our newsletter for updates and campaigns" %}
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                {% trans "Create Account" %}
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                {% trans "Already have an account?" %}
+                <a href="{% url 'account_login' %}" class="link-primary">{% trans "Sign in" %}</a>
+            </p>
+        </div>
+
+        <!-- Phone OTP Registration Section -->
+        <div class="phone-login-section">
+            <div class="divider">
+                <span>{% trans "or" %}</span>
+            </div>
+            
+            <button type="button" class="btn btn-outline btn-full" id="phoneSignupToggle">
+                {% trans "Sign up with Phone Number" %}
+            </button>
+            
+            <div class="phone-login-form" id="phoneSignupForm" style="display: none;">
+                <div class="form-group">
+                    <label for="signupPhoneNumber">{% trans "Phone Number" %}</label>
+                    <div class="phone-input-group">
+                        <select id="signupCountryCode" class="country-code">
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                            <option value="+86">+86</option>
+                            <option value="+81">+81</option>
+                        </select>
+                        <input type="tel" 
+                               id="signupPhoneNumber" 
+                               class="form-control" 
+                               placeholder="{% trans 'Enter phone number' %}"
+                               maxlength="15">
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-primary btn-full" id="signupSendOTP">
+                    {% trans "Send OTP" %}
+                </button>
+                
+                <div class="otp-section" id="signupOTPSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="signupOTPInput">{% trans "Enter OTP" %}</label>
+                        <div class="otp-input-group">
+                            <input type="text" id="signupOTPInput" class="form-control" placeholder="000000" maxlength="6">
+                        </div>
+                        <div class="otp-timer">
+                            <span id="signupOTPTimer">{% trans "Resend OTP in" %} <span id="signupCountdown">60</span>s</span>
+                            <button type="button" id="signupResendOTP" class="link-primary" style="display: none;">
+                                {% trans "Resend OTP" %}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary btn-full" id="signupVerifyOTP">
+                        {% trans "Verify & Create Account" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const eyeIcon = this.querySelector('.eye-icon');
+            const eyeSlashIcon = this.querySelector('.eye-slash-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'none';
+                eyeSlashIcon.style.display = 'block';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'block';
+                eyeSlashIcon.style.display = 'none';
+            }
+        });
+    });
+
+    // Password strength checker
+    const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        updatePasswordStrength(strength);
+    });
+    
+    function checkPasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score++;
+        if (password.match(/[a-z]/)) score++;
+        if (password.match(/[A-Z]/)) score++;
+        if (password.match(/[0-9]/)) score++;
+        if (password.match(/[^a-zA-Z0-9]/)) score++;
+        
+        if (score <= 2) return 'weak';
+        if (score <= 3) return 'medium';
+        return 'strong';
+    }
+    
+    function updatePasswordStrength(strength) {
+        const colors = {
+            weak: '#ef4444',
+            medium: '#f59e0b',
+            strong: '#10b981'
+        };
+        
+        const texts = {
+            weak: '{% trans "Weak password" %}',
+            medium: '{% trans "Medium strength" %}',
+            strong: '{% trans "Strong password" %}'
+        };
+        
+        strengthFill.style.width = strength === 'weak' ? '33%' : strength === 'medium' ? '66%' : '100%';
+        strengthFill.style.backgroundColor = colors[strength];
+        strengthText.textContent = texts[strength];
+        strengthText.style.color = colors[strength];
+    }
+
+    // Phone signup toggle
+    const phoneSignupToggle = document.getElementById('phoneSignupToggle');
+    const phoneSignupForm = document.getElementById('phoneSignupForm');
+    
+    phoneSignupToggle.addEventListener('click', function() {
+        if (phoneSignupForm.style.display === 'none') {
+            phoneSignupForm.style.display = 'block';
+            this.textContent = '{% trans "Hide Phone Signup" %}';
+        } else {
+            phoneSignupForm.style.display = 'none';
+            this.textContent = '{% trans "Sign up with Phone Number" %}';
+        }
+    });
+
+    // Send OTP functionality for signup
+    const signupSendOTP = document.getElementById('signupSendOTP');
+    const signupOTPSection = document.getElementById('signupOTPSection');
+    const signupOTPTimer = document.getElementById('signupOTPTimer');
+    const signupCountdown = document.getElementById('signupCountdown');
+    const signupResendOTP = document.getElementById('signupResendOTP');
+    
+    signupSendOTP.addEventListener('click', function() {
+        const phoneNumber = document.getElementById('signupPhoneNumber').value;
+        const countryCode = document.getElementById('signupCountryCode').value;
+        
+        if (!phoneNumber) {
+            alert('{% trans "Please enter a phone number" %}');
+            return;
+        }
+        
+        // Simulate OTP sending
+        this.textContent = '{% trans "Sending..." %}';
+        this.disabled = true;
+        
+        setTimeout(() => {
+            this.textContent = '{% trans "OTP Sent!" %}';
+            signupOTPSection.style.display = 'block';
+            startSignupOTPTimer();
+        }, 2000);
+    });
+
+    // Verify OTP functionality for signup
+    const signupVerifyOTP = document.getElementById('signupVerifyOTP');
+    signupVerifyOTP.addEventListener('click', function() {
+        const otp = document.getElementById('signupOTPInput').value;
+        
+        if (!otp || otp.length !== 6) {
+            alert('{% trans "Please enter a valid 6-digit OTP" %}');
+            return;
+        }
+        
+        // Simulate OTP verification
+        this.textContent = '{% trans "Verifying..." %}';
+        this.disabled = true;
+        
+        setTimeout(() => {
+            alert('{% trans "Phone number verification is not fully implemented yet. Please use email registration." %}');
+            this.textContent = '{% trans "Verify & Create Account" %}';
+            this.disabled = false;
+        }, 2000);
+    });
+
+    function startSignupOTPTimer() {
+        let timeLeft = 60;
+        signupCountdown.textContent = timeLeft;
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            signupCountdown.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                signupOTPTimer.style.display = 'none';
+                signupResendOTP.style.display = 'inline';
+            }
+        }, 1000);
+    }
+
+    // Resend OTP functionality for signup
+    signupResendOTP.addEventListener('click', function() {
+        this.style.display = 'none';
+        signupOTPTimer.style.display = 'inline';
+        startSignupOTPTimer();
+        
+        // Simulate resending OTP
+        setTimeout(() => {
+            alert('{% trans "OTP resent successfully!" %}');
+        }, 1000);
+    });
+});
+</script>
+{% endblock %}
+
+
+
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign Up" %} - Give Grip{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>{% trans "Join Give Grip" %}</h1>
+            <p>{% trans "Create your account and start making a difference today" %}</p>
+        </div>
+
+        {% get_providers as socialaccount_providers %}
+        
+        {% if socialaccount_providers %}
+        <div class="social-login-section">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-google" title="Continue with Google">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                {% trans "Continue with Google" %}
+            </a>
+            
+            <div class="divider">
+                <span>{% trans "or" %}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="alert alert-error">
+            <h3>{% trans "Please correct the following errors:" %}</h3>
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form class="signup-form" method="POST" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">{% trans "First Name" %}</label>
+                    <input type="text" 
+                           name="{{ form.first_name.name }}" 
+                           id="{{ form.first_name.id_for_label }}"
+                           value="{{ form.first_name.value|default:'' }}"
+                           class="form-control {% if form.first_name.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your first name' %}"
+                           required>
+                    {% if form.first_name.errors %}
+                    <div class="error-message">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">{% trans "Last Name" %}</label>
+                    <input type="text" 
+                           name="{{ form.last_name.name }}" 
+                           id="{{ form.last_name.id_for_label }}"
+                           value="{{ form.last_name.value|default:'' }}"
+                           class="form-control {% if form.last_name.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your last name' %}"
+                           required>
+                    {% if form.last_name.errors %}
+                    <div class="error-message">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{% trans "Email Address" %}</label>
+                <input type="email" 
+                       name="{{ form.email.name }}" 
+                       id="{{ form.email.id_for_label }}"
+                       value="{{ form.email.value|default:'' }}"
+                       class="form-control {% if form.email.errors %}error{% endif %}"
+                       placeholder="{% trans 'Enter your email address' %}"
+                       required>
+                {% if form.email.errors %}
+                <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.phone_number.id_for_label }}">{% trans "Phone Number (Optional)" %}</label>
+                <div class="phone-input-group">
+                                            <select id="countryCode" class="country-code" title="Country Code">
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                            <option value="+86">+86</option>
+                            <option value="+81">+81</option>
+                        </select>
+                    <input type="tel" 
+                           name="{{ form.phone_number.name }}" 
+                           id="{{ form.phone_number.id_for_label }}"
+                           value="{{ form.phone_number.value|default:'' }}"
+                           class="form-control {% if form.phone_number.errors %}error{% endif %}"
+                           placeholder="{% trans 'Enter your phone number' %}"
+                           maxlength="15">
+                </div>
+                {% if form.phone_number.errors %}
+                <div class="error-message">{{ form.phone_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">{% trans "Password" %}</label>
+                <div class="password-input-group">
+                    <input type="password" 
+                           name="{{ form.password1.name }}" 
+                           id="{{ form.password1.id_for_label }}"
+                           class="form-control {% if form.password1.errors %}error{% endif %}"
+                           placeholder="{% trans 'Create a strong password' %}"
+                           required>
+                    <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                        <svg class="eye-slash-icon" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                <div class="error-message">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Password Strength Indicator -->
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <span class="strength-text" id="strengthText">{% trans "Password strength" %}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">{% trans "Confirm Password" %}</label>
+                <div class="password-input-group">
+                    <input type="password" 
+                           name="{{ form.password2.name }}" 
+                           id="{{ form.password2.id_for_label }}"
+                           class="form-control {% if form.password2.errors %}error{% endif %}"
+                           placeholder="{% trans 'Confirm your password' %}"
+                           required>
+                    <button type="button" class="password-toggle" title="Toggle Password Visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                        <svg class="eye-slash-icon" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                <div class="error-message">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <span class="checkmark"></span>
+                    {% trans "I agree to the" %} <a href="{% url 'terms_of_service' %}" target="_blank">{% trans "Terms of Service" %}</a> {% trans "and" %} <a href="{% url 'privacy_policy' %}" target="_blank">{% trans "Privacy Policy" %}</a>
+                </label>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" name="newsletter" id="newsletter">
+                    <span class="checkmark"></span>
+                    {% trans "Subscribe to our newsletter for updates and campaigns" %}
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                {% trans "Create Account" %}
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                {% trans "Already have an account?" %}
+                <a href="{% url 'account_login' %}" class="link-primary">{% trans "Sign in" %}</a>
+            </p>
+        </div>
+
+        <!-- Phone OTP Registration Section -->
+        <div class="phone-login-section">
+            <div class="divider">
+                <span>{% trans "or" %}</span>
+            </div>
+            
+            <button type="button" class="btn btn-outline btn-full" id="phoneSignupToggle">
+                {% trans "Sign up with Phone Number" %}
+            </button>
+            
+            <div class="phone-login-form" id="phoneSignupForm" style="display: none;">
+                <div class="form-group">
+                    <label for="signupPhoneNumber">{% trans "Phone Number" %}</label>
+                    <div class="phone-input-group">
+                        <select id="signupCountryCode" class="country-code">
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                            <option value="+86">+86</option>
+                            <option value="+81">+81</option>
+                        </select>
+                        <input type="tel" 
+                               id="signupPhoneNumber" 
+                               class="form-control" 
+                               placeholder="{% trans 'Enter phone number' %}"
+                               maxlength="15">
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-primary btn-full" id="signupSendOTP">
+                    {% trans "Send OTP" %}
+                </button>
+                
+                <div class="otp-section" id="signupOTPSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="signupOTPInput">{% trans "Enter OTP" %}</label>
+                        <div class="otp-input-group">
+                            <input type="text" id="signupOTPInput" class="form-control" placeholder="000000" maxlength="6">
+                        </div>
+                        <div class="otp-timer">
+                            <span id="signupOTPTimer">{% trans "Resend OTP in" %} <span id="signupCountdown">60</span>s</span>
+                            <button type="button" id="signupResendOTP" class="link-primary" style="display: none;">
+                                {% trans "Resend OTP" %}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary btn-full" id="signupVerifyOTP">
+                        {% trans "Verify & Create Account" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const eyeIcon = this.querySelector('.eye-icon');
+            const eyeSlashIcon = this.querySelector('.eye-slash-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'none';
+                eyeSlashIcon.style.display = 'block';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'block';
+                eyeSlashIcon.style.display = 'none';
+            }
+        });
+    });
+
+    // Password strength checker
+    const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        updatePasswordStrength(strength);
+    });
+    
+    function checkPasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score++;
+        if (password.match(/[a-z]/)) score++;
+        if (password.match(/[A-Z]/)) score++;
+        if (password.match(/[0-9]/)) score++;
+        if (password.match(/[^a-zA-Z0-9]/)) score++;
+        
+        if (score <= 2) return 'weak';
+        if (score <= 3) return 'medium';
+        return 'strong';
+    }
+    
+    function updatePasswordStrength(strength) {
+        const colors = {
+            weak: '#ef4444',
+            medium: '#f59e0b',
+            strong: '#10b981'
+        };
+        
+        const texts = {
+            weak: '{% trans "Weak password" %}',
+            medium: '{% trans "Medium strength" %}',
+            strong: '{% trans "Strong password" %}'
+        };
+        
+        strengthFill.style.width = strength === 'weak' ? '33%' : strength === 'medium' ? '66%' : '100%';
+        strengthFill.style.backgroundColor = colors[strength];
+        strengthText.textContent = texts[strength];
+        strengthText.style.color = colors[strength];
+    }
+
+    // Phone signup toggle
+    const phoneSignupToggle = document.getElementById('phoneSignupToggle');
+    const phoneSignupForm = document.getElementById('phoneSignupForm');
+    
+    phoneSignupToggle.addEventListener('click', function() {
+        if (phoneSignupForm.style.display === 'none') {
+            phoneSignupForm.style.display = 'block';
+            this.textContent = '{% trans "Hide Phone Signup" %}';
+        } else {
+            phoneSignupForm.style.display = 'none';
+            this.textContent = '{% trans "Sign up with Phone Number" %}';
+        }
+    });
+
+    // Send OTP functionality for signup
+    const signupSendOTP = document.getElementById('signupSendOTP');
+    const signupOTPSection = document.getElementById('signupOTPSection');
+    const signupOTPTimer = document.getElementById('signupOTPTimer');
+    const signupCountdown = document.getElementById('signupCountdown');
+    const signupResendOTP = document.getElementById('signupResendOTP');
+    
+    signupSendOTP.addEventListener('click', function() {
+        const phoneNumber = document.getElementById('signupPhoneNumber').value;
+        const countryCode = document.getElementById('signupCountryCode').value;
+        
+        if (!phoneNumber) {
+            alert('{% trans "Please enter a phone number" %}');
+            return;
+        }
+        
+        // Simulate OTP sending
+        this.textContent = '{% trans "Sending..." %}';
+        this.disabled = true;
+        
+        setTimeout(() => {
+            this.textContent = '{% trans "OTP Sent!" %}';
+            signupOTPSection.style.display = 'block';
+            startSignupOTPTimer();
+        }, 2000);
+    });
+
+    // Verify OTP functionality for signup
+    const signupVerifyOTP = document.getElementById('signupVerifyOTP');
+    signupVerifyOTP.addEventListener('click', function() {
+        const otp = document.getElementById('signupOTPInput').value;
+        
+        if (!otp || otp.length !== 6) {
+            alert('{% trans "Please enter a valid 6-digit OTP" %}');
+            return;
+        }
+        
+        // Simulate OTP verification
+        this.textContent = '{% trans "Verifying..." %}';
+        this.disabled = true;
+        
+        setTimeout(() => {
+            alert('{% trans "Phone number verification is not fully implemented yet. Please use email registration." %}');
+            this.textContent = '{% trans "Verify & Create Account" %}';
+            this.disabled = false;
+        }, 2000);
+    });
+
+    function startSignupOTPTimer() {
+        let timeLeft = 60;
+        signupCountdown.textContent = timeLeft;
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            signupCountdown.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                signupOTPTimer.style.display = 'none';
+                signupResendOTP.style.display = 'inline';
+            }
+        }, 1000);
+    }
+
+    // Resend OTP functionality for signup
+    signupResendOTP.addEventListener('click', function() {
+        this.style.display = 'none';
+        signupOTPTimer.style.display = 'inline';
+        startSignupOTPTimer();
+        
+        // Simulate resending OTP
+        setTimeout(() => {
+            alert('{% trans "OTP resent successfully!" %}');
+        }, 1000);
+    });
+});
+</script>
+{% endblock %}
+
+

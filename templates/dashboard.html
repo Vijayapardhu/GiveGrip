@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Give Grip{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="dashboard-header-content">
+            <div class="welcome-section">
+                <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+                <p>Here's an overview of your giving activity and impact</p>
+            </div>
+            <div class="quick-actions">
+                <a href="{% url 'campaigns:campaign-list' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Find Campaigns
+                </a>
+                <a href="#" class="btn btn-outline" onclick="openModal('profileModal')">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Stats -->
+<section class="dashboard-stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="totalDonations">0</div>
+                    <div class="stat-label">Total Donations</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="totalAmount">$0</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="activeCampaigns">0</div>
+                    <div class="stat-label">Active Campaigns</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number" id="thisMonth">$0</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Content -->
+<section class="dashboard-content">
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Recent Donations -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Recent Donations</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="donations-list" id="recentDonations">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading donations...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Campaign Progress -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Campaign Progress</h2>
+                    <a href="{% url 'campaigns:campaign-list' %}" class="view-all">Browse All</a>
+                </div>
+                <div class="card-content">
+                    <div class="campaigns-progress" id="campaignsProgress">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading campaigns...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Payment Methods</h2>
+                    <button class="btn btn-sm btn-primary" onclick="openModal('addPaymentMethodModal')">
+                        <i class="fas fa-plus"></i>
+                        Add New
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="payment-methods-list" id="paymentMethods">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading payment methods...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div class="card-content">
+                    <div class="quick-actions-grid">
+                        <a href="{% url 'campaigns:campaign-list' %}" class="quick-action">
+                            <div class="action-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <span>Find Campaigns</span>
+                        </a>
+                        
+                        <a href="#" class="quick-action" onclick="openModal('donationModal')">
+                            <div class="action-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <span>Make Donation</span>
+                        </a>
+                        
+                        <a href="#" class="quick-action" onclick="openModal('profileModal')">
+                            <div class="action-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <span>Edit Profile</span>
+                        </a>
+                        
+                        <a href="#" class="quick-action" onclick="openModal('settingsModal')">
+                            <div class="action-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Dashboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+// Load dashboard data
+async function loadDashboardData() {
+    try {
+        // Load recent donations
+        await loadRecentDonations();
+        
+        // Load campaign progress
+        await loadCampaignProgress();
+        
+        // Load payment methods
+        await loadPaymentMethods();
+        
+        // Load dashboard stats
+        await loadDashboardStats();
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showToast('Error loading dashboard data. Please refresh the page.', 'error');
+    }
+}
+
+// Load recent donations
+async function loadRecentDonations() {
+    try {
+        const response = await fetch('/api/donations/recent/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const donations = await response.json();
+            displayRecentDonations(donations);
+        } else {
+            throw new Error('Failed to load donations');
+        }
+    } catch (error) {
+        console.error('Error loading donations:', error);
+        document.getElementById('recentDonations').innerHTML = '<p class="error-message">Unable to load donations</p>';
+    }
+}
+
+// Display recent donations
+function displayRecentDonations(donations) {
+    const container = document.getElementById('recentDonations');
+    
+    if (donations.length === 0) {
+        container.innerHTML = '<p class="empty-state">No donations yet. <a href="{% url "campaigns:campaign-list" %}">Start giving today!</a></p>';
+        return;
+    }
+    
+    const donationsHTML = donations.map(donation => `
+        <div class="donation-item">
+            <div class="donation-info">
+                <h4>${donation.campaign_title}</h4>
+                <p class="donation-amount">$${parseFloat(donation.amount).toFixed(2)}</p>
+                <span class="donation-date">${formatRelativeTime(donation.created_at)}</span>
+            </div>
+            <div class="donation-status ${donation.status}">
+                <span>${donation.status}</span>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = donationsHTML;
+}
+
+// Load campaign progress
+async function loadCampaignProgress() {
+    try {
+        const response = await fetch('/api/campaigns/user-progress/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const campaigns = await response.json();
+            displayCampaignProgress(campaigns);
+        } else {
+            throw new Error('Failed to load campaigns');
+        }
+    } catch (error) {
+        console.error('Error loading campaigns:', error);
+        document.getElementById('campaignsProgress').innerHTML = '<p class="error-message">Unable to load campaigns</p>';
+    }
+}
+
+// Display campaign progress
+function displayCampaignProgress(campaigns) {
+    const container = document.getElementById('campaignsProgress');
+    
+    if (campaigns.length === 0) {
+        container.innerHTML = '<p class="empty-state">No campaigns yet. <a href="{% url "campaigns:campaign-list" %}">Browse campaigns</a></p>';
+        return;
+    }
+    
+    const campaignsHTML = campaigns.map(campaign => `
+        <div class="campaign-progress-item">
+            <div class="campaign-info">
+                <h4>${campaign.title}</h4>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${(campaign.raised / campaign.goal) * 100}%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>$${campaign.raised.toLocaleString()} raised</span>
+                    <span>${Math.round((campaign.raised / campaign.goal) * 100)}% of $${campaign.goal.toLocaleString()}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = campaignsHTML;
+}
+
+// Load payment methods
+async function loadPaymentMethods() {
+    try {
+        const response = await fetch('/api/payments/methods/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const methods = await response.json();
+            displayPaymentMethods(methods);
+        } else {
+            throw new Error('Failed to load payment methods');
+        }
+    } catch (error) {
+        console.error('Error loading payment methods:', error);
+        document.getElementById('paymentMethods').innerHTML = '<p class="error-message">Unable to load payment methods</p>';
+    }
+}
+
+// Display payment methods
+function displayPaymentMethods(methods) {
+    const container = document.getElementById('paymentMethods');
+    
+    if (methods.length === 0) {
+        container.innerHTML = '<p class="empty-state">No payment methods yet. <a href="#" onclick="openModal(\'addPaymentMethodModal\')">Add one now</a></p>';
+        return;
+    }
+    
+    const methodsHTML = methods.map(method => `
+        <div class="payment-method-item">
+            <div class="method-info">
+                <div class="method-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="method-details">
+                    <h4>${method.payment_type}</h4>
+                    <p>${method.masked_details}</p>
+                </div>
+            </div>
+            <div class="method-actions">
+                ${method.is_default ? '<span class="default-badge">Default</span>' : ''}
+                <button class="btn btn-sm btn-outline" onclick="setDefaultPaymentMethod(${method.id})">Set Default</button>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = methodsHTML;
+}
+
+// Load dashboard stats
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('/api/users/dashboard-stats/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const stats = await response.json();
+            displayDashboardStats(stats);
+        } else {
+            throw new Error('Failed to load stats');
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+// Display dashboard stats
+function displayDashboardStats(stats) {
+    document.getElementById('totalDonations').textContent = stats.total_donations || 0;
+    document.getElementById('totalAmount').textContent = formatCurrency(stats.total_amount || 0);
+    document.getElementById('activeCampaigns').textContent = stats.active_campaigns || 0;
+    document.getElementById('thisMonth').textContent = formatCurrency(stats.this_month || 0);
+}
+
+// Set default payment method
+async function setDefaultPaymentMethod(methodId) {
+    try {
+        const response = await fetch(`/api/payments/payment-methods/${methodId}/set_default/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            showToast('Default payment method updated!', 'success');
+            // Refresh payment methods
+            loadPaymentMethods();
+        } else {
+            const result = await response.json();
+            showToast(result.message || 'Failed to update default method', 'error');
+        }
+    } catch (error) {
+        console.error('Error setting default payment method:', error);
+        showToast('An error occurred. Please try again.', 'error');
+    }
+}
+
+// Format relative time
+function formatRelativeTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    
+    return date.toLocaleDateString();
+}
+
+// Format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(amount);
+}
+</script>
+{% endblock %}
+
+
+
+
