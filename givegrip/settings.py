@@ -83,25 +83,26 @@ WSGI_APPLICATION = 'givegrip.wsgi.application'
 # Database
 import dj_database_url
 
-# Get database URL from environment or use SQLite as fallback
-DATABASE_URL = config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
+# Database configuration
+# For now, use SQLite to get the application running
+# We can migrate to PostgreSQL later
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-if DATABASE_URL.startswith('postgresql://'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    # Fallback to SQLite for development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# TODO: Uncomment this when PostgreSQL is properly configured
+# DATABASE_URL = config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
+# if DATABASE_URL.startswith('postgresql://'):
+#     DATABASES = {
+#         'default': dj_database_url.config(
+#             default=DATABASE_URL,
+#             conn_max_age=600,
+#             conn_health_checks=True,
+#         )
+#     }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
