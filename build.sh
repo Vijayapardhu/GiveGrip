@@ -18,10 +18,14 @@ fi
 pip install -r requirements.txt
 
 python manage.py collectstatic --no-input
-python manage.py migrate
 
-# Setup CMS data if it doesn't exist
-python manage.py setup_cms
-
-# Create superuser if it doesn't exist (will be skipped if already exists)
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@givegrip.com', 'admin123') if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
+# Check if DATABASE_URL is set and valid
+if [ -n "$DATABASE_URL" ] && [[ "$DATABASE_URL" == postgresql://* ]]; then
+    echo "PostgreSQL database URL detected, running migrations..."
+    python manage.py migrate
+    python manage.py setup_cms
+    echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@givegrip.com', 'admin123') if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
+else
+    echo "No valid DATABASE_URL found, skipping database operations"
+    echo "This is normal for the first deployment before database linking"
+fi
