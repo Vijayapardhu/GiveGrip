@@ -271,7 +271,7 @@ function initDonationForm() {
                 submitBtn.disabled = false;
                 amountInput.classList.remove('is-invalid');
                 amountInput.classList.add('is-valid');
-            } else {
+    } else {
                 submitBtn.disabled = true;
                 amountInput.classList.remove('is-valid');
                 amountInput.classList.add('is-invalid');
@@ -459,8 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
     handleResize();
     
     // Event listeners
-    window.addEventListener('resize', debouncedResize);
-    
+window.addEventListener('resize', debouncedResize);
+
     // Global error handling
     window.addEventListener('error', (e) => {
         console.error('Global error:', e.error);
