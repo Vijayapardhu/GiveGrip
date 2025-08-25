@@ -3,68 +3,643 @@
 
 {% block title %}About Us - GiveGrip{% endblock %}
 
+{% block extra_css %}
+<style>
+/* About Page Container */
+.about-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+/* Hero Section */
+.about-hero {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideInUp 0.8s ease-out;
+}
+
+.about-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.about-hero .lead {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+}
+
+.about-hero-icon {
+    font-size: 6rem;
+    color: rgba(255, 255, 255, 0.3);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    animation: float 4s ease-in-out infinite;
+}
+
+/* Mission Vision Cards */
+.mission-vision-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    animation: slideInUp 0.8s ease-out 0.2s both;
+    height: 100%;
+}
+
+.mission-vision-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.mission-vision-card .card-body {
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.mission-vision-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.mission-vision-card:hover .mission-vision-icon {
+    transform: scale(1.1);
+}
+
+.mission-vision-card h4 {
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+.mission-vision-card p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Why Choose Section */
+.why-choose-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    margin: 3rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideInUp 0.8s ease-out 0.4s both;
+}
+
+.why-choose-section h3 {
+    color: white;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.why-choose-section p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+.why-choose-item {
+    text-align: center;
+    padding: 2rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.why-choose-item:hover {
+    transform: translateY(-5px);
+}
+
+.why-choose-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.why-choose-item:hover .why-choose-icon {
+    transform: scale(1.1);
+}
+
+.why-choose-item h5 {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+}
+
+.why-choose-item p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Stats Section */
+.stats-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 3rem 0;
+    animation: slideInUp 0.8s ease-out 0.6s both;
+}
+
+.stats-section .card-body {
+    padding: 3rem;
+}
+
+.stats-section h3 {
+    color: #1f2937;
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.stats-section p {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Team Section */
+.team-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    margin: 3rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideInUp 0.8s ease-out 0.8s both;
+}
+
+.team-section h3 {
+    color: white;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.team-section p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+.team-member {
+    text-align: center;
+    padding: 2rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-5px);
+}
+
+.team-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.team-member:hover .team-avatar {
+    transform: scale(1.1);
+}
+
+.team-member h5 {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.team-member p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 20px;
+    margin-top: 3rem;
+    animation: slideInUp 0.8s ease-out 1s both;
+}
+
+.cta-section h3 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.cta-section .lead {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.cta-btn {
+    height: 55px;
+    background: white;
+    color: #2563eb;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0 2rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: #1d4ed8;
+    text-decoration: none;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .about-container {
+        padding: 10px;
+    }
+    
+    .about-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .mission-vision-card .card-body {
+        padding: 2rem;
+    }
+    
+    .why-choose-section h3 {
+        font-size: 2rem;
+    }
+    
+    .team-section h3 {
+        font-size: 2rem;
+    }
+    
+    .cta-section h3 {
+        font-size: 1.8rem;
+    }
+    
+    .stats-section .card-body {
+        padding: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5 pt-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="text-center mb-5">
-                <h1 class="display-4 fw-bold text-primary">About GiveGrip</h1>
-                <p class="lead">Empowering communities through crowdfunding and charitable giving</p>
+<div class="about-container">
+    <!-- Hero Section -->
+    <section class="about-hero text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="fw-bold mb-3">About GiveGrip</h1>
+                    <p class="lead mb-4">Empowering communities through crowdfunding and charitable giving. We believe everyone has the power to make a difference.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-heart me-2"></i>
+                            <span>Community Driven</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <span>Secure & Transparent</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-globe me-2"></i>
+                            <span>Global Impact</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="about-hero-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
             </div>
-            
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-5">
+        <div class="container">
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-center mb-3">
-                                <i class="fas fa-heart text-danger" style="font-size: 2.5rem;"></i>
+                <div class="col-lg-6">
+                    <div class="mission-vision-card">
+                        <div class="card-body">
+                            <div class="mission-vision-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                <i class="fas fa-heart"></i>
                             </div>
-                            <h4 class="card-title text-center">Our Mission</h4>
-                            <p class="card-text">To connect generous donors with meaningful causes, making it easy for anyone to support the projects and people they care about most.</p>
+                            <h4>Our Mission</h4>
+                            <p>To connect generous donors with meaningful causes, making it easy for anyone to support the projects and people they care about most. We believe in the power of collective action to create positive change.</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-center mb-3">
-                                <i class="fas fa-users text-primary" style="font-size: 2.5rem;"></i>
+                <div class="col-lg-6">
+                    <div class="mission-vision-card">
+                        <div class="card-body">
+                            <div class="mission-vision-icon" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                                <i class="fas fa-users"></i>
                             </div>
-                            <h4 class="card-title text-center">Our Vision</h4>
-                            <p class="card-text">A world where every person has the power to make a difference through accessible, transparent, and impactful crowdfunding.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-5">
-                <h3 class="text-center mb-4">Why Choose GiveGrip?</h3>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-shield-alt text-success mb-3" style="font-size: 2rem;"></i>
-                            <h5>Secure & Transparent</h5>
-                            <p class="text-muted">Your donations are safe and you can track exactly where your money goes.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-mobile-alt text-info mb-3" style="font-size: 2rem;"></i>
-                            <h5>Easy to Use</h5>
-                            <p class="text-muted">Simple, intuitive platform that works on any device, anywhere.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-globe text-warning mb-3" style="font-size: 2rem;"></i>
-                            <h5>Global Reach</h5>
-                            <p class="text-muted">Connect with causes and donors from around the world.</p>
+                            <h4>Our Vision</h4>
+                            <p>A world where every person has the power to make a difference through accessible, transparent, and impactful crowdfunding. We envision a future where generosity knows no boundaries.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Why Choose GiveGrip -->
+    <section class="why-choose-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h3>Why Choose GiveGrip?</h3>
+                <p>Discover what makes us the trusted platform for charitable giving</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Secure & Transparent</h5>
+                        <p>Your donations are safe with bank-level security and complete transparency in fund allocation.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h5>Easy to Use</h5>
+                        <p>Simple, intuitive platform that works seamlessly on any device, anywhere in the world.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h5>Global Reach</h5>
+                        <p>Connect with causes and donors from around the world, breaking geographical barriers.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5>Real-time Tracking</h5>
+                        <p>Monitor campaign progress, donor contributions, and impact metrics in real-time.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h5>24/7 Support</h5>
+                        <p>Round-the-clock customer support to help you with any questions or concerns.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="why-choose-item">
+                        <div class="why-choose-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <h5>Verified Causes</h5>
+                        <p>All campaigns are thoroughly verified to ensure legitimacy and maximum impact.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Stats -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="card-body">
+                <h3>Our Impact</h3>
+                <p>See the difference we're making together</p>
+                
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number">₹18.5Cr+</span>
+                            <div class="stat-label">Total Raised</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number">50K+</span>
+                            <div class="stat-label">Donors</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number">1.2K+</span>
+                            <div class="stat-label">Campaigns</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number">95%</span>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h3>Meet Our Team</h3>
+                <p>Passionate individuals dedicated to making a difference</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="team-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5>Rahul Sharma</h5>
+                        <p>Founder & CEO</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="team-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5>Priya Patel</h5>
+                        <p>Head of Operations</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="team-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5>Amit Kumar</h5>
+                        <p>Technology Lead</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3>Ready to Make a Difference?</h3>
+                    <p class="lead mb-0">Join thousands of people who are already making an impact through GiveGrip.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="{% url 'main_campaigns:campaign_list' %}" class="cta-btn">
+                        <i class="fas fa-heart me-2"></i>Browse Campaigns
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling to all links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Animate stats on scroll
+    const observerOptions = {
+        threshold: 0.5
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.stat-number').forEach(stat => {
+        stat.style.opacity = '0';
+        stat.style.transform = 'translateY(20px)';
+        stat.style.transition = 'all 0.6s ease';
+        observer.observe(stat);
+    });
+});
+</script>
 {% endblock %}
