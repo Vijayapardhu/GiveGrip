@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Donations - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0">My Donations</h1>
+                <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-primary">
+                    <i class="fas fa-heart me-2"></i>Browse Campaigns
+                </a>
+            </div>
+            
+            {% if donations %}
+                <div class="row">
+                    {% for donation in donations %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            {% if donation.campaign.cover_image %}
+                                <img src="{{ donation.campaign.cover_image.url }}" class="card-img-top" alt="{{ donation.campaign.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-heart text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{ donation.campaign.title }}</h5>
+                                <p class="card-text text-muted small">{{ donation.campaign.description|truncatewords:20 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-primary">{{ donation.amount }} {{ donation.currency }}</span>
+                                    <span class="badge bg-{% if donation.status == 'paid' %}success{% elif donation.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                        {{ donation.status|title }}
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ donation.created_at|date:"M d, Y" }}</small>
+                                    <a href="{% url 'main_campaigns:campaign_detail' donation.campaign.pk %}" class="btn btn-sm btn-outline-primary">
+                                        View Campaign
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if donations.has_other_pages %}
+                <nav aria-label="Donations pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if donations.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ donations.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in donations.paginator.page_range %}
+                            {% if donations.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > donations.number|add:'-3' and num < donations.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if donations.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ donations.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-heart text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3 class="text-muted mb-3">No Donations Yet</h3>
+                    <p class="text-muted mb-4">You haven't made any donations yet. Start making a difference today!</p>
+                    <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-heart me-2"></i>Find a Cause
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

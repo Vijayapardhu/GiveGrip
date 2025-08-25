@@ -1,425 +1,336 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Dashboard - Give Grip{% endblock %}
+{% block title %}Dashboard - GiveGrip{% endblock %}
 
 {% block content %}
 <!-- Dashboard Header -->
-<section class="dashboard-header">
+<section class="bg-gradient-primary text-white py-5">
     <div class="container">
-        <div class="dashboard-header-content">
-            <div class="welcome-section">
-                <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
-                <p>Here's an overview of your giving activity and impact</p>
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                <p class="lead mb-4">Track your impact and manage your campaigns from your personal dashboard.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>Start New Campaign
+                    </a>
+                    <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Browse Campaigns
+                    </a>
+                </div>
             </div>
-            <div class="quick-actions">
-                <a href="{% url 'campaigns:campaign-list' %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Find Campaigns
-                </a>
-                <a href="#" class="btn btn-outline" onclick="openModal('profileModal')">
-                    <i class="fas fa-user-edit"></i>
-                    Edit Profile
-                </a>
+            <div class="col-lg-4 text-center">
+                <div class="dashboard-avatar">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" 
+                             class="rounded-circle border-4 border-white shadow-lg" 
+                             style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle border-4 border-white shadow-lg bg-white d-flex align-items-center justify-content-center mx-auto" 
+                             style="width: 120px; height: 120px;">
+                            <i class="fas fa-user fa-3x text-primary"></i>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Dashboard Stats -->
-<section class="dashboard-stats">
+<section class="py-5">
     <div class="container">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
+        <div class="dashboard-stats">
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-icon bg-primary">
                     <i class="fas fa-heart"></i>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="totalDonations">0</div>
-                    <div class="stat-label">Total Donations</div>
-                </div>
+                <div class="dashboard-stat-value currency-inr">{{ total_donations }}</div>
+                <div class="dashboard-stat-label">Total Donations</div>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-dollar-sign"></i>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-icon bg-success">
+                    <i class="fas fa-rupee-sign"></i>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="totalAmount">$0</div>
-                    <div class="stat-label">Total Amount</div>
-                </div>
+                <div class="dashboard-stat-value currency-inr">{{ total_amount|floatformat:0 }}</div>
+                <div class="dashboard-stat-label">Total Amount Donated</div>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-icon">
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-icon bg-warning">
                     <i class="fas fa-bullseye"></i>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="activeCampaigns">0</div>
-                    <div class="stat-label">Active Campaigns</div>
-                </div>
+                <div class="dashboard-stat-value">{{ campaigns_count }}</div>
+                <div class="dashboard-stat-label">Campaigns Created</div>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-calendar-check"></i>
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-icon bg-info">
+                    <i class="fas fa-users"></i>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="thisMonth">$0</div>
-                    <div class="stat-label">This Month</div>
-                </div>
+                <div class="dashboard-stat-value">{{ campaigns_supported }}</div>
+                <div class="dashboard-stat-label">Campaigns Supported</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Dashboard Content -->
-<section class="dashboard-content">
+<!-- Recent Activity -->
+<section class="py-5 bg-light">
     <div class="container">
-        <div class="dashboard-grid">
+        <div class="row">
             <!-- Recent Donations -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2>Recent Donations</h2>
-                    <a href="#" class="view-all">View All</a>
-                </div>
-                <div class="card-content">
-                    <div class="donations-list" id="recentDonations">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading donations...</p>
-                        </div>
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-heart me-2"></i>Recent Donations
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if donations %}
+                            <div class="donations-list">
+                                {% for donation in donations %}
+                                    <div class="d-flex align-items-center p-3 border-bottom">
+                                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-heart text-white"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ donation.campaign.title|truncatechars:30 }}</h6>
+                                            <small class="text-muted">{{ donation.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-success currency-inr">{{ donation.amount|floatformat:0 }}</div>
+                                            <small class="badge bg-{% if donation.status == 'paid' %}success{% elif donation.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                                {{ donation.get_status_display }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'accounts:my_donations' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-2"></i>View All Donations
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-heart text-muted fa-3x mb-3"></i>
+                                <h5 class="text-muted">No donations yet</h5>
+                                <p class="text-muted">Start making a difference by donating to campaigns!</p>
+                                <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Browse Campaigns
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             
-            <!-- Campaign Progress -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2>Campaign Progress</h2>
-                    <a href="{% url 'campaigns:campaign-list' %}" class="view-all">Browse All</a>
-                </div>
-                <div class="card-content">
-                    <div class="campaigns-progress" id="campaignsProgress">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading campaigns...</p>
-                        </div>
+            <!-- My Campaigns -->
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-bullseye me-2"></i>My Campaigns
+                        </h4>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Payment Methods -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2>Payment Methods</h2>
-                    <button class="btn btn-sm btn-primary" onclick="openModal('addPaymentMethodModal')">
-                        <i class="fas fa-plus"></i>
-                        Add New
-                    </button>
-                </div>
-                <div class="card-content">
-                    <div class="payment-methods-list" id="paymentMethods">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading payment methods...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2>Quick Actions</h2>
-                </div>
-                <div class="card-content">
-                    <div class="quick-actions-grid">
-                        <a href="{% url 'campaigns:campaign-list' %}" class="quick-action">
-                            <div class="action-icon">
-                                <i class="fas fa-search"></i>
+                    <div class="card-body">
+                        {% if campaigns %}
+                            <div class="campaigns-list">
+                                {% for campaign in campaigns %}
+                                    <div class="d-flex align-items-center p-3 border-bottom">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-bullseye text-white"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ campaign.title|truncatechars:30 }}</h6>
+                                            <small class="text-muted">Created {{ campaign.created_at|date:"M d, Y" }}</small>
+                                            <div class="progress mt-2" style="height: 4px;">
+                                                <div class="progress-bar" style="width: {{ campaign.progress_percentage }}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-primary currency-inr">{{ campaign.collected_amount|floatformat:0 }}</div>
+                                            <small class="text-muted">of {{ campaign.goal_amount|floatformat:0 }}</small>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <span>Find Campaigns</span>
-                        </a>
-                        
-                        <a href="#" class="quick-action" onclick="openModal('donationModal')">
-                            <div class="action-icon">
-                                <i class="fas fa-heart"></i>
+                            <div class="text-center mt-3">
+                                <a href="#" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-2"></i>View All Campaigns
+                                </a>
                             </div>
-                            <span>Make Donation</span>
-                        </a>
-                        
-                        <a href="#" class="quick-action" onclick="openModal('profileModal')">
-                            <div class="action-icon">
-                                <i class="fas fa-user-edit"></i>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-bullseye text-muted fa-3x mb-3"></i>
+                                <h5 class="text-muted">No campaigns yet</h5>
+                                <p class="text-muted">Start your first campaign and make a difference!</p>
+                                <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Create Campaign
+                                </a>
                             </div>
-                            <span>Edit Profile</span>
-                        </a>
-                        
-                        <a href="#" class="quick-action" onclick="openModal('settingsModal')">
-                            <div class="action-icon">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <span>Settings</span>
-                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
 
-{% block extra_js %}
+<!-- Quick Actions -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="fw-bold mb-4">Quick Actions</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-plus fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Start Campaign</h5>
+                                <p class="text-muted mb-3">Create a new fundraising campaign and share your story with the world.</p>
+                                <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Create Campaign
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-heart fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Make Donation</h5>
+                                <p class="text-muted mb-3">Browse campaigns and make a donation to support causes you care about.</p>
+                                <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-success">
+                                    <i class="fas fa-heart me-2"></i>Browse Campaigns
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-user fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Update Profile</h5>
+                                <p class="text-muted mb-3">Keep your profile information up to date and manage your account settings.</p>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-warning">
+                                    <i class="fas fa-user me-2"></i>Edit Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Impact Summary -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="fw-bold mb-4">Your Impact Summary</h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="fas fa-chart-line fa-2x text-white"></i>
+                                </div>
+                                <h4 class="fw-bold text-primary currency-inr">{{ total_amount|floatformat:0 }}</h4>
+                                <p class="text-muted mb-0">Total Amount Donated</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="fas fa-hands-helping fa-2x text-white"></i>
+                                </div>
+                                <h4 class="fw-bold text-success">{{ total_donations }}</h4>
+                                <p class="text-muted mb-0">Lives Impacted</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.dashboard-avatar {
+    animation: float 3s ease-in-out infinite;
+}
+
+.donations-list .d-flex,
+.campaigns-list .d-flex {
+    transition: all var(--transition-fast);
+}
+
+.donations-list .d-flex:hover,
+.campaigns-list .d-flex:hover {
+    background-color: var(--gray-50);
+    border-radius: var(--radius-lg);
+    transform: translateX(5px);
+}
+
+.progress {
+    background-color: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width var(--transition-slow);
+}
+</style>
+
 <script>
-// Dashboard functionality
 document.addEventListener('DOMContentLoaded', function() {
-    loadDashboardData();
+    // Add animation classes to dashboard elements
+    const statCards = document.querySelectorAll('.dashboard-stat-card');
+    statCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-fade-in-up');
+    });
+    
+    // Add hover effects to quick action cards
+    const quickActionCards = document.querySelectorAll('.card');
+    quickActionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
 });
-
-// Load dashboard data
-async function loadDashboardData() {
-    try {
-        // Load recent donations
-        await loadRecentDonations();
-        
-        // Load campaign progress
-        await loadCampaignProgress();
-        
-        // Load payment methods
-        await loadPaymentMethods();
-        
-        // Load dashboard stats
-        await loadDashboardStats();
-        
-    } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        showToast('Error loading dashboard data. Please refresh the page.', 'error');
-    }
-}
-
-// Load recent donations
-async function loadRecentDonations() {
-    try {
-        const response = await fetch('/api/donations/recent/', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const donations = await response.json();
-            displayRecentDonations(donations);
-        } else {
-            throw new Error('Failed to load donations');
-        }
-    } catch (error) {
-        console.error('Error loading donations:', error);
-        document.getElementById('recentDonations').innerHTML = '<p class="error-message">Unable to load donations</p>';
-    }
-}
-
-// Display recent donations
-function displayRecentDonations(donations) {
-    const container = document.getElementById('recentDonations');
-    
-    if (donations.length === 0) {
-        container.innerHTML = '<p class="empty-state">No donations yet. <a href="{% url "campaigns:campaign-list" %}">Start giving today!</a></p>';
-        return;
-    }
-    
-    const donationsHTML = donations.map(donation => `
-        <div class="donation-item">
-            <div class="donation-info">
-                <h4>${donation.campaign_title}</h4>
-                <p class="donation-amount">$${parseFloat(donation.amount).toFixed(2)}</p>
-                <span class="donation-date">${formatRelativeTime(donation.created_at)}</span>
-            </div>
-            <div class="donation-status ${donation.status}">
-                <span>${donation.status}</span>
-            </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = donationsHTML;
-}
-
-// Load campaign progress
-async function loadCampaignProgress() {
-    try {
-        const response = await fetch('/api/campaigns/user-progress/', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const campaigns = await response.json();
-            displayCampaignProgress(campaigns);
-        } else {
-            throw new Error('Failed to load campaigns');
-        }
-    } catch (error) {
-        console.error('Error loading campaigns:', error);
-        document.getElementById('campaignsProgress').innerHTML = '<p class="error-message">Unable to load campaigns</p>';
-    }
-}
-
-// Display campaign progress
-function displayCampaignProgress(campaigns) {
-    const container = document.getElementById('campaignsProgress');
-    
-    if (campaigns.length === 0) {
-        container.innerHTML = '<p class="empty-state">No campaigns yet. <a href="{% url "campaigns:campaign-list" %}">Browse campaigns</a></p>';
-        return;
-    }
-    
-    const campaignsHTML = campaigns.map(campaign => `
-        <div class="campaign-progress-item">
-            <div class="campaign-info">
-                <h4>${campaign.title}</h4>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${(campaign.raised / campaign.goal) * 100}%"></div>
-                </div>
-                <div class="progress-stats">
-                    <span>$${campaign.raised.toLocaleString()} raised</span>
-                    <span>${Math.round((campaign.raised / campaign.goal) * 100)}% of $${campaign.goal.toLocaleString()}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = campaignsHTML;
-}
-
-// Load payment methods
-async function loadPaymentMethods() {
-    try {
-        const response = await fetch('/api/payments/methods/', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const methods = await response.json();
-            displayPaymentMethods(methods);
-        } else {
-            throw new Error('Failed to load payment methods');
-        }
-    } catch (error) {
-        console.error('Error loading payment methods:', error);
-        document.getElementById('paymentMethods').innerHTML = '<p class="error-message">Unable to load payment methods</p>';
-    }
-}
-
-// Display payment methods
-function displayPaymentMethods(methods) {
-    const container = document.getElementById('paymentMethods');
-    
-    if (methods.length === 0) {
-        container.innerHTML = '<p class="empty-state">No payment methods yet. <a href="#" onclick="openModal(\'addPaymentMethodModal\')">Add one now</a></p>';
-        return;
-    }
-    
-    const methodsHTML = methods.map(method => `
-        <div class="payment-method-item">
-            <div class="method-info">
-                <div class="method-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="method-details">
-                    <h4>${method.payment_type}</h4>
-                    <p>${method.masked_details}</p>
-                </div>
-            </div>
-            <div class="method-actions">
-                ${method.is_default ? '<span class="default-badge">Default</span>' : ''}
-                <button class="btn btn-sm btn-outline" onclick="setDefaultPaymentMethod(${method.id})">Set Default</button>
-            </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = methodsHTML;
-}
-
-// Load dashboard stats
-async function loadDashboardStats() {
-    try {
-        const response = await fetch('/api/users/dashboard-stats/', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const stats = await response.json();
-            displayDashboardStats(stats);
-        } else {
-            throw new Error('Failed to load stats');
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
-    }
-}
-
-// Display dashboard stats
-function displayDashboardStats(stats) {
-    document.getElementById('totalDonations').textContent = stats.total_donations || 0;
-    document.getElementById('totalAmount').textContent = formatCurrency(stats.total_amount || 0);
-    document.getElementById('activeCampaigns').textContent = stats.active_campaigns || 0;
-    document.getElementById('thisMonth').textContent = formatCurrency(stats.this_month || 0);
-}
-
-// Set default payment method
-async function setDefaultPaymentMethod(methodId) {
-    try {
-        const response = await fetch(`/api/payments/payment-methods/${methodId}/set_default/`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            showToast('Default payment method updated!', 'success');
-            // Refresh payment methods
-            loadPaymentMethods();
-        } else {
-            const result = await response.json();
-            showToast(result.message || 'Failed to update default method', 'error');
-        }
-    } catch (error) {
-        console.error('Error setting default payment method:', error);
-        showToast('An error occurred. Please try again.', 'error');
-    }
-}
-
-// Format relative time
-function formatRelativeTime(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    
-    return date.toLocaleDateString();
-}
-
-// Format currency
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
 </script>
 {% endblock %}
 

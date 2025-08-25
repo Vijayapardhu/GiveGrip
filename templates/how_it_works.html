@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}How It Works - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary mb-3">How GiveGrip Works</h1>
+                <p class="lead text-muted">Making fundraising simple, transparent, and effective</p>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <h2 class="mb-0">1</h2>
+                            </div>
+                            <h4 class="card-title">Create Your Campaign</h4>
+                            <p class="card-text">Start by creating a compelling campaign with a clear goal, story, and timeline. Add photos and videos to make your cause more engaging.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <h2 class="mb-0">2</h2>
+                            </div>
+                            <h4 class="card-title">Share & Promote</h4>
+                            <p class="card-text">Share your campaign on social media, email, and other platforms. The more people who see your campaign, the more likely you are to reach your goal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <h2 class="mb-0">3</h2>
+                            </div>
+                            <h4 class="card-title">Receive Donations</h4>
+                            <p class="card-text">Donors can contribute securely using various payment methods. All transactions are processed safely and transparently.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <h2 class="mb-0">4</h2>
+                            </div>
+                            <h4 class="card-title">Track Progress</h4>
+                            <p class="card-text">Monitor your campaign's progress in real-time. See how much you've raised and how many people have supported your cause.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">Why Choose GiveGrip?</h2>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                        <h5>Secure Payments</h5>
+                        <p class="text-muted">All transactions are encrypted and secure</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                        <h5>Real-time Tracking</h5>
+                        <p class="text-muted">Monitor your campaign progress instantly</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <h5>Community Support</h5>
+                        <p class="text-muted">Connect with donors and supporters</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center mt-5">
+                <h3 class="mb-3">Ready to Start Your Campaign?</h3>
+                <p class="lead mb-4">Join thousands of people who are making a difference through GiveGrip</p>
+                <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-primary btn-lg me-3">Create Campaign</a>
+                <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-outline-primary btn-lg">Browse Campaigns</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

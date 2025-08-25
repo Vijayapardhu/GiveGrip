@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Successful - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Payment Successful!</h2>
+                    <p class="lead mb-4">Thank you for your generous donation. Your contribution will make a real difference.</p>
+                    
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-info-circle me-2"></i>What happens next?</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li>✓ You'll receive a confirmation email shortly</li>
+                            <li>✓ The campaign creator will be notified of your donation</li>
+                            <li>✓ Your donation will be reflected in the campaign progress</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a href="{% url 'pages:home' %}" class="btn btn-primary me-md-2">
+                            <i class="fas fa-home me-1"></i>
+                            Back to Home
+                        </a>
+                        <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-heart me-1"></i>
+                            Browse More Campaigns
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

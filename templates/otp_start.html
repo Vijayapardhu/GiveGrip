@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Phone Verification - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Phone Verification</h1>
+            <p>Enter your phone number to receive a verification code</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-group">
+                    <select class="form-select" style="max-width: 120px;">
+                        <option value="+1">+1 (US)</option>
+                        <option value="+44">+44 (UK)</option>
+                        <option value="+91">+91 (IN)</option>
+                        <option value="+61">+61 (AU)</option>
+                        <option value="+86">+86 (CN)</option>
+                    </select>
+                    <input type="tel" id="phone" name="phone" class="form-control" 
+                           placeholder="Enter phone number" required>
+                </div>
+                <small class="form-text text-muted">
+                    We'll send a 6-digit verification code to this number
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">Send Verification Code</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'accounts:login' %}" class="link-primary">Sign in</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

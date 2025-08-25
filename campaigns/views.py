@@ -1,53 +1,218 @@
-from rest_framework import status, generics, permissions, filters
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, status, permissions, filters
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Count, Sum
-from django.utils import timezone
-from rest_framework.permissions import IsAuthenticated
-
-from .models import Category, Campaign, CampaignUpdate, CampaignComment, CampaignShare
+from django.db.models import Q, F
+from .models import Campaign, CampaignCategory, CampaignImage, CampaignUpdate
 from .serializers import (
-    CategorySerializer, CampaignSerializer, CampaignCreateSerializer,
-    CampaignUpdateSerializer, CampaignUpdateCreateSerializer,
-    CampaignCommentSerializer, CampaignCommentCreateSerializer,
-    CampaignShareSerializer, CampaignShareCreateSerializer,
+    CampaignSerializer, CampaignCreateSerializer, CampaignUpdateSerializer,
+    CampaignDetailSerializer, CampaignCategorySerializer, CampaignImageSerializer,
+    CampaignUpdateSerializer as CampaignUpdateModelSerializer,
+    CampaignImageCreateSerializer, CampaignUpdateCreateSerializer,
     CampaignSearchSerializer
 )
 
 
-class CategoryListView(generics.ListAPIView):
-    """List all campaign categories."""
+class CampaignCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for CampaignCategory model."""
     
-    queryset = Category.objects.filter(is_active=True)
-    serializer_class = CategorySerializer
+    queryset = CampaignCategory.objects.filter(is_active=True)
+    serializer_class = CampaignCategorySerializer
     permission_classes = [permissions.AllowAny]
-
-
-class CategoryDetailView(generics.RetrieveAPIView):
-    """Retrieve a specific category."""
     
-    queryset = Category.objects.filter(is_active=True)
-    serializer_class = CategorySerializer
-    permission_classes = [permissions.AllowAny]
+    @action(detail=True, methods=['get'])
+    def campaigns(self, request, pk=None):
+        """Get campaigns in a specific category."""
+        category = self.get_object()
+        campaigns = Campaign.objects.filter(category=category, status='active')
+        serializer = CampaignSerializer(campaigns, many=True)
+        return Response(serializer.data)
 
 
-class CampaignListView(generics.ListAPIView):
-    """List all campaigns with filtering and search."""
+class CampaignViewSet(viewsets.ModelViewSet):
+    """ViewSet for Campaign model."""
     
+    queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
-    permission_classes = [permissions.AllowAny]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'description', 'story', 'creator_name', 'creator_organization']
-    ordering_fields = ['created_at', 'goal_amount', 'current_amount', 'start_date', 'end_date']
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'category', 'is_featured', 'is_verified', 'currency']
+    search_fields = ['title', 'description', 'story']
+    ordering_fields = ['created_at', 'goal_amount', 'current_amount', 'end_date']
     ordering = ['-created_at']
     
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CampaignCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return CampaignUpdateSerializer
+        elif self.action == 'retrieve':
+            return CampaignDetailSerializer
+        return CampaignSerializer
+    
     def get_queryset(self):
-        queryset = Campaign.objects.select_related('category').prefetch_related(
-            'updates', 'comments', 'shares'
-        )
+        """Filter campaigns based on user permissions."""
+        queryset = super().get_queryset()
         
+        # If user is not authenticated, only show active campaigns
+        if not self.request.user.is_authenticated:
+            return queryset.filter(status='active')
+        
+        # If user is staff, show all campaigns
+        if self.request.user.is_staff:
+            return queryset
+        
+        # For regular users, show active campaigns and their own campaigns
+        return queryset.filter(
+            Q(status='active') | Q(creator=self.request.user)
+        )
+    
+    def perform_create(self, serializer):
+        """Set the creator when creating a campaign."""
+        serializer.save(creator=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def increment_view(self, request, pk=None):
+        """Increment campaign view count."""
+        campaign = self.get_object()
+        campaign.view_count = F('view_count') + 1
+        campaign.save()
+        campaign.refresh_from_db()
+        return Response({'view_count': campaign.view_count})
+    
+    @action(detail=True, methods=['post'])
+    def increment_share(self, request, pk=None):
+        """Increment campaign share count."""
+        campaign = self.get_object()
+        campaign.share_count = F('share_count') + 1
+        campaign.save()
+        campaign.refresh_from_db()
+        return Response({'share_count': campaign.share_count})
+    
+    @action(detail=False, methods=['get'])
+    def featured(self, request):
+        """Get featured campaigns."""
+        campaigns = self.get_queryset().filter(is_featured=True, status='active')
+        serializer = self.get_serializer(campaigns, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def trending(self, request):
+        """Get trending campaigns (based on views and donations)."""
+        campaigns = self.get_queryset().filter(status='active').order_by(
+            '-view_count', '-donor_count', '-current_amount'
+        )[:10]
+        serializer = self.get_serializer(campaigns, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def ending_soon(self, request):
+        """Get campaigns ending soon."""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get campaigns ending in the next 7 days
+        end_date = timezone.now() + timedelta(days=7)
+        campaigns = self.get_queryset().filter(
+            status='active',
+            end_date__lte=end_date
+        ).order_by('end_date')
+        
+        serializer = self.get_serializer(campaigns, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def search(self, request):
+        """Advanced campaign search."""
+        serializer = CampaignSearchSerializer(data=request.data)
+        if serializer.is_valid():
+            queryset = self.get_queryset()
+            
+            # Apply search filters
+            if serializer.validated_data.get('query'):
+                query = serializer.validated_data['query']
+                queryset = queryset.filter(
+                    Q(title__icontains=query) |
+                    Q(description__icontains=query) |
+                    Q(story__icontains=query)
+                )
+            
+            if serializer.validated_data.get('category'):
+                queryset = queryset.filter(category__name__icontains=serializer.validated_data['category'])
+            
+            if serializer.validated_data.get('min_amount'):
+                queryset = queryset.filter(goal_amount__gte=serializer.validated_data['min_amount'])
+            
+            if serializer.validated_data.get('max_amount'):
+                queryset = queryset.filter(goal_amount__lte=serializer.validated_data['max_amount'])
+            
+            if serializer.validated_data.get('status'):
+                queryset = queryset.filter(status=serializer.validated_data['status'])
+            
+            if serializer.validated_data.get('featured') is not None:
+                queryset = queryset.filter(is_featured=serializer.validated_data['featured'])
+            
+            if serializer.validated_data.get('verified') is not None:
+                queryset = queryset.filter(is_verified=serializer.validated_data['verified'])
+            
+            # Paginate results
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CampaignImageViewSet(viewsets.ModelViewSet):
+    """ViewSet for CampaignImage model."""
+    
+    serializer_class = CampaignImageSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_queryset(self):
+        campaign_id = self.kwargs.get('campaign_pk')
+        return CampaignImage.objects.filter(campaign_id=campaign_id)
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CampaignImageCreateSerializer
+        return CampaignImageSerializer
+    
+    def perform_create(self, serializer):
+        campaign_id = self.kwargs.get('campaign_pk')
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        serializer.save(campaign=campaign)
+
+
+class CampaignUpdateViewSet(viewsets.ModelViewSet):
+    """ViewSet for CampaignUpdate model."""
+    
+    serializer_class = CampaignUpdateModelSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_queryset(self):
+        campaign_id = self.kwargs.get('campaign_pk')
+        return CampaignUpdate.objects.filter(campaign_id=campaign_id)
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CampaignUpdateCreateSerializer
+        return CampaignUpdateModelSerializer
+    
+    def perform_create(self, serializer):
+        campaign_id = self.kwargs.get('campaign_pk')
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        serializer.save(campaign=campaign)
+
+
+
+
+
         # Filter by status
         status_filter = self.request.query_params.get('status', 'active')
         if status_filter:

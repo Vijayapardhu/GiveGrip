@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-sign-in-alt fa-2x text-white"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2">Welcome Back</h2>
+                        <p class="text-muted">Sign in to your account to continue making a difference</p>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Login Form -->
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="username" class="form-label fw-bold">
+                                <i class="fas fa-user me-2"></i>Username or Email
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" 
+                                   placeholder="Enter your username or email" required>
+                            <div class="invalid-feedback">
+                                Please enter your username or email.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-bold">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter your password" required>
+                                <button class="btn btn-outline-secondary password-toggle" type="button" aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter your password.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="{% url 'accounts:forgot_password' %}" class="text-decoration-none text-primary fw-bold">
+                                Forgot password?
+                            </a>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative">
+                            <hr class="my-4">
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                or continue with
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100 py-3" type="button">
+                                <i class="fab fa-google me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100 py-3" type="button">
+                                <i class="fab fa-facebook-f me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Don't have an account? 
+                            <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-bold text-primary">
+                                Sign up here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="text-center mt-4">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            <small class="text-muted">Secure & Private</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fas fa-heart text-danger me-2"></i>
+                            <small class="text-muted">Make a Difference</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fas fa-users text-primary me-2"></i>
+                            <small class="text-muted">Join Community</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.input-group .btn {
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .form-control {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control:focus {
+    border-right: none;
+    box-shadow: none;
+}
+
+.input-group .form-control:focus + .btn {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.password-toggle:hover {
+    background-color: var(--bs-gray-200);
+}
+
+.password-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.getElementById('password');
+    
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        
+        const icon = this.querySelector('i');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Auto-focus on first input
+    document.getElementById('username').focus();
+});
+</script>
+{% endblock %}
+
+

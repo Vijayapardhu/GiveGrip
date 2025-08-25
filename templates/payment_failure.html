@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Failed - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-danger mb-3">Payment Failed</h2>
+                    <p class="lead mb-4">We're sorry, but your payment could not be processed. Please try again or contact support if the problem persists.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Possible reasons:</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li>• Insufficient funds in your account</li>
+                            <li>• Card details entered incorrectly</li>
+                            <li>• Network connectivity issues</li>
+                            <li>• Payment gateway temporarily unavailable</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a href="{% url 'pages:home' %}" class="btn btn-primary me-md-2">
+                            <i class="fas fa-home me-1"></i>
+                            Back to Home
+                        </a>
+                        <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-heart me-1"></i>
+                            Try Another Campaign
+                        </a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            Need help? Contact our support team at 
+                            <a href="mailto:support@givegrip.com">support@givegrip.com</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

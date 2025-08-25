@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Campaign - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Create New Campaign
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="title" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Campaign Title *
+                                </label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       placeholder="Enter a compelling title for your campaign">
+                                <div class="form-text">Make it catchy and descriptive</div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Short Description *
+                                </label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required
+                                          placeholder="Brief description of your campaign (appears in listings)"></textarea>
+                                <div class="form-text">Keep it concise but informative</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="goal_amount" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>
+                                    Goal Amount *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="goal_amount" name="goal_amount" 
+                                           min="1" step="0.01" required placeholder="0.00">
+                                </div>
+                                <div class="form-text">Set a realistic fundraising goal</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="currency" class="form-label">
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    Currency
+                                </label>
+                                <select class="form-select" id="currency" name="currency">
+                                    <option value="USD" selected>USD - US Dollar</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - British Pound</option>
+                                    <option value="INR">INR - Indian Rupee</option>
+                                    <option value="CAD">CAD - Canadian Dollar</option>
+                                    <option value="AUD">AUD - Australian Dollar</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="story" class="form-label">
+                                    <i class="fas fa-book-open me-1"></i>
+                                    Campaign Story
+                                </label>
+                                <textarea class="form-control" id="story" name="story" rows="6"
+                                          placeholder="Tell your story in detail. Why are you fundraising? What will the money be used for?"></textarea>
+                                <div class="form-text">Share your story to connect with potential donors</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Start Date
+                                </label>
+                                <input type="date" class="form-control" id="start_date" name="start_date">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label">
+                                    <i class="fas fa-calendar-minus me-1"></i>
+                                    End Date
+                                </label>
+                                <input type="date" class="form-control" id="end_date" name="end_date">
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="cover_image" class="form-label">
+                                    <i class="fas fa-image me-1"></i>
+                                    Cover Image
+                                </label>
+                                <input type="file" class="form-control" id="cover_image" name="cover_image" 
+                                       accept="image/*">
+                                <div class="form-text">Upload a compelling image for your campaign (optional)</div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="category" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Category
+                                </label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">Select a category</option>
+                                    <option value="medical">Medical & Health</option>
+                                    <option value="education">Education</option>
+                                    <option value="emergency">Emergency Relief</option>
+                                    <option value="community">Community Projects</option>
+                                    <option value="animals">Animals & Pets</option>
+                                    <option value="environment">Environment</option>
+                                    <option value="arts">Arts & Culture</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Create Campaign
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Campaign Creation Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check-circle text-success me-1"></i>Do's:</h6>
+                            <ul class="list-unstyled">
+                                <li>• Write a compelling title</li>
+                                <li>• Include high-quality images</li>
+                                <li>• Set realistic goals</li>
+                                <li>• Tell your story clearly</li>
+                                <li>• Update donors regularly</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-times-circle text-danger me-1"></i>Don'ts:</h6>
+                            <ul class="list-unstyled">
+                                <li>• Use vague descriptions</li>
+                                <li>• Set unrealistic goals</li>
+                                <li>• Forget to include images</li>
+                                <li>• Ignore donor questions</li>
+                                <li>• Rush the creation process</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date for start_date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').min = today;
+    
+    // Update end_date minimum when start_date changes
+    document.getElementById('start_date').addEventListener('change', function() {
+        document.getElementById('end_date').min = this.value;
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const goalAmount = document.getElementById('goal_amount').value;
+        
+        if (!title || !description || !goalAmount) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        if (parseFloat(goalAmount) <= 0) {
+            e.preventDefault();
+            alert('Goal amount must be greater than 0.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
+

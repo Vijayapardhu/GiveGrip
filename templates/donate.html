@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donate to {{ campaign.title }} - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Campaign Info Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="card-title">{{ campaign.title }}</h3>
+                            <p class="text-muted">{{ campaign.description|truncatewords:30 }}</p>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ campaign.progress_percentage }}%"
+                                         aria-valuenow="{{ campaign.progress_percentage }}" 
+                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small class="text-muted">{{ campaign.progress_percentage|floatformat:1 }}%</small>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <h6 class="text-primary mb-0">{{ campaign.collected_amount|floatformat:2 }}</h6>
+                                    <small class="text-muted">Raised</small>
+                                </div>
+                                <div class="col-4">
+                                    <h6 class="text-success mb-0">{{ campaign.goal_amount|floatformat:2 }}</h6>
+                                    <small class="text-muted">Goal</small>
+                                </div>
+                                <div class="col-4">
+                                    <h6 class="text-info mb-0">{{ campaign.donor_count }}</h6>
+                                    <small class="text-muted">Donors</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            {% if campaign.cover_image %}
+                                <img src="{{ campaign.cover_image.url }}" alt="{{ campaign.title }}" 
+                                     class="img-fluid rounded" style="max-height: 150px;">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="height: 150px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Form -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-heart me-2"></i>
+                        Make a Donation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="donationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Amount Selection -->
+                        <div class="mb-4">
+                            <label for="amount" class="form-label fw-bold">Donation Amount ({{ campaign.currency }})</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ campaign.currency }}</span>
+                                        <input type="number" class="form-control form-control-lg" 
+                                               id="amount" name="amount" min="1" step="0.01" 
+                                               placeholder="Enter amount" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="button" class="btn btn-outline-primary quick-amount" data-amount="10">$10</button>
+                                        <button type="button" class="btn btn-outline-primary quick-amount" data-amount="25">$25</button>
+                                        <button type="button" class="btn btn-outline-primary quick-amount" data-amount="50">$50</button>
+                                        <button type="button" class="btn btn-outline-primary quick-amount" data-amount="100">$100</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message (Optional)</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" 
+                                      placeholder="Leave a message of support..."></textarea>
+                        </div>
+
+                        <!-- Anonymous Donation -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_anonymous" name="is_anonymous">
+                                <label class="form-check-label" for="is_anonymous">
+                                    Make this donation anonymous
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Payment Method</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card border-primary">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-credit-card fa-2x text-primary mb-2"></i>
+                                            <h6 class="card-title">Credit/Debit Card</h6>
+                                            <small class="text-muted">Secure payment via Razorpay</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-secondary">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-university fa-2x text-secondary mb-2"></i>
+                                            <h6 class="card-title">Bank Transfer</h6>
+                                            <small class="text-muted">Direct bank transfer</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-heart me-2"></i>
+                                Donate Now
+                            </button>
+                            <a href="{% url 'main_campaigns:campaign_detail' pk=campaign.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Campaign
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="alert alert-info mt-4">
+                <div class="d-flex">
+                    <i class="fas fa-shield-alt fa-2x text-info me-3"></i>
+                    <div>
+                        <h6 class="alert-heading">Secure Payment</h6>
+                        <p class="mb-0">Your payment information is encrypted and secure. We use industry-standard SSL encryption to protect your data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quick amount buttons
+    const quickAmountButtons = document.querySelectorAll('.quick-amount');
+    const amountInput = document.getElementById('amount');
+    
+    quickAmountButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const amount = this.dataset.amount;
+            amountInput.value = amount;
+            
+            // Update active state
+            quickAmountButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Form validation
+    const form = document.getElementById('donationForm');
+    form.addEventListener('submit', function(e) {
+        const amount = parseFloat(amountInput.value);
+        if (!amount || amount <= 0) {
+            e.preventDefault();
+            alert('Please enter a valid amount greater than 0.');
+            amountInput.focus();
+        }
+    });
+});
+</script>
+{% endblock %}

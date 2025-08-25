@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Campaign - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Edit Campaign
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="title" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Campaign Title *
+                                </label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       value="{{ campaign.title }}" placeholder="Enter a compelling title for your campaign">
+                                <div class="form-text">Make it catchy and descriptive</div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Short Description *
+                                </label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required
+                                          placeholder="Brief description of your campaign (appears in listings)">{{ campaign.description }}</textarea>
+                                <div class="form-text">Keep it concise but informative</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="goal_amount" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>
+                                    Goal Amount *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="goal_amount" name="goal_amount" 
+                                           min="1" step="0.01" required value="{{ campaign.goal_amount }}" placeholder="0.00">
+                                </div>
+                                <div class="form-text">Set a realistic fundraising goal</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="currency" class="form-label">
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    Currency
+                                </label>
+                                <select class="form-select" id="currency" name="currency">
+                                    <option value="USD" {% if campaign.currency == 'USD' %}selected{% endif %}>USD - US Dollar</option>
+                                    <option value="EUR" {% if campaign.currency == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+                                    <option value="GBP" {% if campaign.currency == 'GBP' %}selected{% endif %}>GBP - British Pound</option>
+                                    <option value="INR" {% if campaign.currency == 'INR' %}selected{% endif %}>INR - Indian Rupee</option>
+                                    <option value="CAD" {% if campaign.currency == 'CAD' %}selected{% endif %}>CAD - Canadian Dollar</option>
+                                    <option value="AUD" {% if campaign.currency == 'AUD' %}selected{% endif %}>AUD - Australian Dollar</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="story" class="form-label">
+                                    <i class="fas fa-book-open me-1"></i>
+                                    Campaign Story
+                                </label>
+                                <textarea class="form-control" id="story" name="story" rows="6"
+                                          placeholder="Tell your story in detail. Why are you fundraising? What will the money be used for?">{{ campaign.story }}</textarea>
+                                <div class="form-text">Share your story to connect with potential donors</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Start Date
+                                </label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" 
+                                       value="{% if campaign.start_date %}{{ campaign.start_date|date:'Y-m-d' }}{% endif %}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label">
+                                    <i class="fas fa-calendar-minus me-1"></i>
+                                    End Date
+                                </label>
+                                <input type="date" class="form-control" id="end_date" name="end_date"
+                                       value="{% if campaign.end_date %}{{ campaign.end_date|date:'Y-m-d' }}{% endif %}">
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="cover_image" class="form-label">
+                                    <i class="fas fa-image me-1"></i>
+                                    Cover Image
+                                </label>
+                                {% if campaign.cover_image %}
+                                    <div class="mb-2">
+                                        <img src="{{ campaign.cover_image.url }}" alt="Current cover image" class="img-thumbnail" style="max-height: 100px;">
+                                        <small class="text-muted d-block">Current image</small>
+                                    </div>
+                                {% endif %}
+                                <input type="file" class="form-control" id="cover_image" name="cover_image" 
+                                       accept="image/*">
+                                <div class="form-text">Upload a new image to replace the current one (optional)</div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="category" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Category
+                                </label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">Select a category</option>
+                                    <option value="medical" {% if campaign.category == 'medical' %}selected{% endif %}>Medical & Health</option>
+                                    <option value="education" {% if campaign.category == 'education' %}selected{% endif %}>Education</option>
+                                    <option value="emergency" {% if campaign.category == 'emergency' %}selected{% endif %}>Emergency Relief</option>
+                                    <option value="community" {% if campaign.category == 'community' %}selected{% endif %}>Community Projects</option>
+                                    <option value="animals" {% if campaign.category == 'animals' %}selected{% endif %}>Animals & Pets</option>
+                                    <option value="environment" {% if campaign.category == 'environment' %}selected{% endif %}>Environment</option>
+                                    <option value="arts" {% if campaign.category == 'arts' %}selected{% endif %}>Arts & Culture</option>
+                                    <option value="sports" {% if campaign.category == 'sports' %}selected{% endif %}>Sports</option>
+                                    <option value="other" {% if campaign.category == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="status" class="form-label">
+                                    <i class="fas fa-toggle-on me-1"></i>
+                                    Status
+                                </label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="draft" {% if campaign.status == 'draft' %}selected{% endif %}>Draft</option>
+                                    <option value="active" {% if campaign.status == 'active' %}selected{% endif %}>Active</option>
+                                    <option value="paused" {% if campaign.status == 'paused' %}selected{% endif %}>Paused</option>
+                                    <option value="completed" {% if campaign.status == 'completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <div class="form-text">Change campaign status as needed</div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'main_campaigns:campaign_detail' pk=campaign.pk %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i>
+                                Update Campaign
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date for start_date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').min = today;
+    
+    // Update end_date minimum when start_date changes
+    document.getElementById('start_date').addEventListener('change', function() {
+        document.getElementById('end_date').min = this.value;
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const goalAmount = document.getElementById('goal_amount').value;
+        
+        if (!title || !description || !goalAmount) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        if (parseFloat(goalAmount) <= 0) {
+            e.preventDefault();
+            alert('Goal amount must be greater than 0.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
+

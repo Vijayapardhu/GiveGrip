@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Test Page - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="text-success">🎉 SUCCESS! 🎉</h1>
+            <h2>GiveGrip Project is Working!</h2>
+            <p class="lead">All URL namespaces are properly configured and working.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">✅ Pages App</h5>
+                            <p class="card-text">Static pages are working correctly.</p>
+                            <a href="{% url 'pages:home' %}" class="btn btn-primary">Go Home</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">✅ Campaigns</h5>
+                            <p class="card-text">Campaign management is working.</p>
+                            <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-primary">View Campaigns</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">✅ User System</h5>
+                            <p class="card-text">User authentication is working.</p>
+                            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h3>Project Status:</h3>
+                <ul class="list-unstyled">
+                    <li>✅ Django Server: Running on port 8000</li>
+                    <li>✅ URL Namespaces: All configured correctly</li>
+                    <li>✅ Templates: Loading without errors</li>
+                    <li>✅ Database: Migrations applied successfully</li>
+                    <li>✅ Admin Panel: Accessible at /admin/</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,9 +1,23 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
-app_name = 'campaigns'
+# Main router for campaigns
+router = DefaultRouter()
+router.register(r'categories', views.CampaignCategoryViewSet)
+router.register(r'campaigns', views.CampaignViewSet)
 
 urlpatterns = [
+    # Main router URLs
+    path('', include(router.urls)),
+    
+    # Simple nested URLs for now
+    path('campaigns/<int:campaign_pk>/images/', views.CampaignImageViewSet.as_view({'get': 'list', 'post': 'create'}), name='campaign-images'),
+    path('campaigns/<int:campaign_pk>/updates/', views.CampaignUpdateViewSet.as_view({'get': 'list', 'post': 'create'}), name='campaign-updates'),
+]
+
+
+
     # Category endpoints
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
     path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail'),

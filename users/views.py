@@ -1,77 +1,218 @@
-from rest_framework import status, generics, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, status, permissions
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import login, logout
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
-import random
-import string
-
-from .models import User, UserProfile, PhoneVerification
+from .models import UserProfile, PhoneVerification
 from .serializers import (
-    UserSerializer, UserRegistrationSerializer, UserLoginSerializer,
-    PhoneVerificationSerializer, SendOTPSerializer, VerifyOTPSerializer,
-    PasswordResetSerializer, PasswordResetConfirmSerializer,
-    UserUpdateSerializer, ProfileUpdateSerializer
+    UserSerializer, UserCreateSerializer, UserUpdateSerializer,
+    PasswordChangeSerializer, UserProfileSerializer, PhoneVerificationSerializer,
+    PhoneVerificationRequestSerializer, UserDetailSerializer
 )
+
+User = get_user_model()
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """ViewSet for User model."""
+    
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return UserCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return UserUpdateSerializer
+        elif self.action == 'retrieve':
+            return UserDetailSerializer
+        return UserSerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.AllowAny()]
+        elif self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return super().get_permissions()
+    
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Get current user information."""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['put', 'patch'])
+    def update_profile(self, request):
+        """Update current user profile."""
+        serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def change_password(self, request):
+        """Change user password."""
+        serializer = PasswordChangeSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = request.user
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'message': 'Password changed successfully'})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def request_phone_verification(self, request):
+        """Request phone verification code."""
+        serializer = PhoneVerificationRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            phone_number = serializer.validated_data['phone_number']
+            
+            # Generate verification code (6 digits)
+            import random
+            verification_code = str(random.randint(100000, 999999))
+            
+            # Set expiration time (10 minutes from now)
+            expires_at = timezone.now() + timedelta(minutes=10)
+            
+            # Create or update verification record
+            verification, created = PhoneVerification.objects.update_or_create(
+                user=request.user,
+                phone_number=phone_number,
+                defaults={
+                    'verification_code': verification_code,
+                    'expires_at': expires_at,
+                    'is_verified': False
+                }
+            )
+            
+            # TODO: Send SMS with verification code
+            # For now, just return the code (remove in production)
+            return Response({
+                'message': 'Verification code sent successfully',
+                'verification_code': verification_code  # Remove this in production
+            })
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def verify_phone(self, request):
+        """Verify phone number with verification code."""
+        serializer = PhoneVerificationSerializer(data=request.data)
+        if serializer.is_valid():
+            phone_number = serializer.validated_data['phone_number']
+            verification_code = serializer.validated_data['verification_code']
+            
+            try:
+                verification = PhoneVerification.objects.get(
+                    user=request.user,
+                    phone_number=phone_number,
+                    verification_code=verification_code,
+                    is_verified=False
+                )
+                
+                if verification.is_expired:
+                    return Response(
+                        {'error': 'Verification code has expired'}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                # Mark as verified
+                verification.is_verified = True
+                verification.save()
+                
+                # Update user phone verification status
+                request.user.phone_verified = True
+                request.user.phone_number = phone_number
+                request.user.save()
+                
+                return Response({'message': 'Phone number verified successfully'})
+                
+            except PhoneVerification.DoesNotExist:
+                return Response(
+                    {'error': 'Invalid verification code'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """ViewSet for UserProfile model."""
+    
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return UserProfile.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=False, methods=['get', 'put', 'patch'])
+    def my_profile(self, request):
+        """Get or update current user's profile."""
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        if request.method == 'GET':
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        
+        elif request.method in ['PUT', 'PATCH']:
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserRegistrationView(APIView):
-    """User registration endpoint."""
+    """User registration view."""
     
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            token, created = Token.objects.get_or_create(user=user)
-            
+            # Create user profile
+            UserProfile.objects.create(user=user)
             return Response({
-                'message': 'User registered successfully.',
-                'user': UserSerializer(user).data,
-                'token': token.key
+                'message': 'User registered successfully',
+                'user_id': user.id
             }, status=status.HTTP_201_CREATED)
-        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserLoginView(APIView):
-    """User login endpoint."""
-    
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            login(request, user)
-            token, created = Token.objects.get_or_create(user=user)
-            
-            return Response({
-                'message': 'Login successful.',
-                'user': UserSerializer(user).data,
-                'token': token.key
-            }, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserLogoutView(APIView):
-    """User logout endpoint."""
+class UserStatsView(APIView):
+    """Get user statistics."""
     
     permission_classes = [permissions.IsAuthenticated]
     
-    def post(self, request):
-        try:
-            request.user.auth_token.delete()
-        except:
-            pass
+    def get(self, request):
+        user = request.user
         
-        logout(request)
-        return Response({'message': 'Logout successful.'}, status=status.HTTP_200_OK)
+        # Get donation statistics
+        total_donations = user.donations.filter(status='completed').count()
+        total_amount = sum([d.amount for d in user.donations.filter(status='completed')])
+        
+        # Get campaign statistics
+        total_campaigns = user.campaigns.count()
+        active_campaigns = user.campaigns.filter(status='active').count()
+        
+        return Response({
+            'total_donations': total_donations,
+            'total_amount': total_amount,
+            'total_campaigns': total_campaigns,
+            'active_campaigns': active_campaigns,
+            'is_donor': user.is_donor,
+            'is_campaign_creator': user.is_campaign_creator
+        })
+
 
 
 class UserProfileView(APIView):

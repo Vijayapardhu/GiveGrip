@@ -1,233 +1,70 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}About Us - Give Grip{% endblock %}
+{% block title %}About Us - GiveGrip{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<section class="page-header">
-    <div class="container">
-        <div class="page-header-content">
-            <h1>About Give Grip</h1>
-            <p>Learn about our mission to make charitable giving accessible, transparent, and impactful</p>
-        </div>
-    </div>
-</section>
-
-<!-- Mission Section -->
-<section class="mission">
-    <div class="container">
-        <div class="mission-content">
-            <div class="mission-text">
-                <h2>Our Mission</h2>
-                <p>
-                    At Give Grip, we believe that everyone should have the power to make a positive impact in the world. 
-                    Our mission is to create a secure, transparent, and user-friendly platform that connects generous 
-                    donors with meaningful causes, making charitable giving accessible to everyone.
-                </p>
-                <p>
-                    We're committed to building trust through transparency, ensuring that every dollar donated reaches 
-                    its intended destination and creates real change in communities around the world.
-                </p>
-            </div>
-            <div class="mission-image">
-                <div class="mission-visual">
-                    <i class="fas fa-globe-americas"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Values Section -->
-<section class="values">
-    <div class="container">
-        <div class="section-header">
-            <h2>Our Core Values</h2>
-            <p>The principles that guide everything we do</p>
-        </div>
-        
-        <div class="values-grid">
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Trust & Security</h3>
-                <p>We prioritize the security of your personal and financial information above all else, using industry-leading encryption and security practices.</p>
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">About GiveGrip</h1>
+                <p class="lead">Empowering communities through crowdfunding and charitable giving</p>
             </div>
             
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-eye"></i>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-heart text-danger" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center">Our Mission</h4>
+                            <p class="card-text">To connect generous donors with meaningful causes, making it easy for anyone to support the projects and people they care about most.</p>
+                        </div>
+                    </div>
                 </div>
-                <h3>Transparency</h3>
-                <p>We believe in complete transparency, providing detailed reporting and real-time updates on how your donations are being used.</p>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-users text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center">Our Vision</h4>
+                            <p class="card-text">A world where every person has the power to make a difference through accessible, transparent, and impactful crowdfunding.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-users"></i>
+            <div class="mt-5">
+                <h3 class="text-center mb-4">Why Choose GiveGrip?</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-shield-alt text-success mb-3" style="font-size: 2rem;"></i>
+                            <h5>Secure & Transparent</h5>
+                            <p class="text-muted">Your donations are safe and you can track exactly where your money goes.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-mobile-alt text-info mb-3" style="font-size: 2rem;"></i>
+                            <h5>Easy to Use</h5>
+                            <p class="text-muted">Simple, intuitive platform that works on any device, anywhere.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-globe text-warning mb-3" style="font-size: 2rem;"></i>
+                            <h5>Global Reach</h5>
+                            <p class="text-muted">Connect with causes and donors from around the world.</p>
+                        </div>
+                    </div>
                 </div>
-                <h3>Community</h3>
-                <p>We foster a community of donors and organizations working together to create positive change in the world.</p>
-            </div>
-            
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <h3>Impact</h3>
-                <p>We're focused on maximizing the impact of every donation, ensuring that your generosity creates meaningful change.</p>
-            </div>
-            
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-lightbulb"></i>
-                </div>
-                <h3>Innovation</h3>
-                <p>We continuously innovate to make the donation process simpler, more secure, and more effective for everyone.</p>
-            </div>
-            
-            <div class="value-card">
-                <div class="value-icon">
-                    <i class="fas fa-balance-scale"></i>
-                </div>
-                <h3>Integrity</h3>
-                <p>We operate with the highest ethical standards, ensuring that every decision we make aligns with our mission and values.</p>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Story Section -->
-<section class="story">
-    <div class="container">
-        <div class="story-content">
-            <div class="story-image">
-                <div class="story-visual">
-                    <i class="fas fa-book-open"></i>
-                </div>
-            </div>
-            <div class="story-text">
-                <h2>Our Story</h2>
-                <p>
-                    Give Grip was born from a simple observation: while technology has made many aspects of our lives 
-                    easier and more connected, charitable giving remained complex, opaque, and often inaccessible to 
-                    many people who wanted to help.
-                </p>
-                <p>
-                    Founded in 2024, our team of developers, designers, and nonprofit professionals came together 
-                    with a shared vision: to create a platform that would democratize charitable giving, making it 
-                    as easy as online shopping while maintaining the highest standards of security and transparency.
-                </p>
-                <p>
-                    Today, Give Grip serves thousands of donors and hundreds of organizations, processing millions 
-                    of dollars in donations and helping to fund critical projects around the world. But our work 
-                    is far from done - we're constantly improving and expanding our platform to serve even more 
-                    people and causes.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Team Section -->
-<section class="team">
-    <div class="container">
-        <div class="section-header">
-            <h2>Our Team</h2>
-            <p>Meet the people behind Give Grip</p>
-        </div>
-        
-        <div class="team-grid">
-            <div class="team-member">
-                <div class="member-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3>Alex Johnson</h3>
-                <span class="member-role">CEO & Founder</span>
-                <p>Former nonprofit executive with 15+ years of experience in charitable giving and technology.</p>
-            </div>
-            
-            <div class="team-member">
-                <div class="member-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3>Sarah Chen</h3>
-                <span class="member-role">CTO</span>
-                <p>Technology leader with expertise in secure payment systems and scalable web platforms.</p>
-            </div>
-            
-            <div class="team-member">
-                <div class="member-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3>Michael Rodriguez</h3>
-                <span class="member-role">Head of Operations</span>
-                <p>Operations specialist focused on ensuring smooth, secure, and compliant donation processing.</p>
-            </div>
-            
-            <div class="team-member">
-                <div class="member-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3>Emily Kim</h3>
-                <span class="member-role">Head of Partnerships</span>
-                <p>Partnership expert working to connect donors with verified, impactful organizations.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Impact Section -->
-<section class="impact">
-    <div class="container">
-        <div class="section-header">
-            <h2>Our Impact</h2>
-            <p>Numbers that tell our story</p>
-        </div>
-        
-        <div class="impact-grid">
-            <div class="impact-item">
-                <div class="impact-number">$10M+</div>
-                <div class="impact-label">Total Donations Processed</div>
-            </div>
-            <div class="impact-item">
-                <div class="impact-number">50,000+</div>
-                <div class="impact-label">Active Donors</div>
-            </div>
-            <div class="impact-item">
-                <div class="impact-number">500+</div>
-                <div class="impact-label">Partner Organizations</div>
-            </div>
-            <div class="impact-item">
-                <div class="impact-number">95%</div>
-                <div class="impact-label">Donor Satisfaction Rate</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta">
-    <div class="container">
-        <div class="cta-content">
-            <h2>Join Us in Making a Difference</h2>
-            <p>Ready to start your giving journey? Join thousands of donors who are already making an impact through Give Grip.</p>
-            <div class="cta-actions">
-                <a href="{% url 'campaigns:campaign-list' %}" class="btn btn-primary btn-large">
-                    <i class="fas fa-heart"></i>
-                    Explore Campaigns
-                </a>
-                <a href="{% url 'contact' %}" class="btn btn-outline btn-large">
-                    <i class="fas fa-envelope"></i>
-                    Get in Touch
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+</div>
 {% endblock %}
-
-
-
-

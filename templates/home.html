@@ -1,260 +1,695 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load pages_extras %}
 
-{% block title %}Give Grip - Secure Donation Platform{% endblock %}
+{% block title %}GiveGrip - Make a Difference Through Crowdfunding{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero-section">
     <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title animate-fade-in">
-                Make a Difference<br>
-                <span class="text-gradient">One Donation at a Time</span>
-            </h1>
-            <p class="hero-subtitle animate-fade-in">
-                Join thousands of people making positive change through secure, transparent donations. 
-                Support causes you care about with our trusted platform.
-            </p>
-            <div class="hero-actions animate-fade-in">
-                <a href="{% url 'campaigns' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-heart"></i>
-                    Explore Campaigns
-                </a>
-                <a href="{% url 'create_campaign' %}" class="btn btn-outline btn-lg">
-                    <i class="fas fa-plus"></i>
-                    Start a Campaign
-                </a>
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content animate-fade-in-up">
+                <h1 class="hero-title">Make a Difference Today</h1>
+                <p class="hero-subtitle">Join thousands of people helping others through crowdfunding. Every donation counts, every story matters.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-heart me-2"></i>Browse Campaigns
+                    </a>
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>Start Campaign
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 animate-slide-in-right">
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <div class="bg-white rounded-circle p-4 shadow-lg" style="width: 300px; height: 300px;">
+                            <i class="fas fa-hands-helping text-primary" style="font-size: 8rem; line-height: 1;"></i>
+                        </div>
+                        <div class="position-absolute top-0 start-100 translate-middle">
+                            <div class="bg-success text-white rounded-circle p-3 shadow">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 translate-middle">
+                            <div class="bg-warning text-white rounded-circle p-3 shadow">
+                                <i class="fas fa-heart fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="section bg-gray-50">
+<!-- Statistics Section -->
+<section class="py-5 bg-white">
     <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
+        <div class="row text-center">
+            {% if statistics %}
+                {% for stat in statistics %}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: {{ stat.color }};">
+                                <i class="{{ stat.icon }} fa-2x text-white"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2" style="color: {{ stat.color }};">{{ stat.value }}{{ stat.suffix }}</h3>
+                            <p class="text-muted mb-0">{{ stat.title }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-number" data-count="50000">0</div>
-                <div class="stat-label">Active Donors</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-hand-holding-heart"></i>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback statistics -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-users fa-2x text-white"></i>
+                            </div>
+                            <h3 class="text-primary fw-bold mb-2">50K+</h3>
+                            <p class="text-muted mb-0">Active Donors</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-number" data-count="2500000">0</div>
-                <div class="stat-label">Total Raised</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-bullseye"></i>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-heart fa-2x text-white"></i>
+                            </div>
+                            <h3 class="text-success fw-bold mb-2">1,200+</h3>
+                            <p class="text-muted mb-0">Successful Campaigns</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-number" data-count="1500">0</div>
-                <div class="stat-label">Campaigns</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-globe"></i>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-rupee-sign fa-2x text-white"></i>
+                            </div>
+                            <h3 class="text-warning fw-bold mb-2">₹18.5Cr+</h3>
+                            <p class="text-muted mb-0">Total Raised</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-number" data-count="45">0</div>
-                <div class="stat-label">Countries</div>
-            </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-globe fa-2x text-white"></i>
+                            </div>
+                            <h3 class="text-info fw-bold mb-2">45+</h3>
+                            <p class="text-muted mb-0">Countries Served</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </section>
 
 <!-- Features Section -->
-<section class="section">
+{% if features %}
+<section class="py-5 bg-light">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Why Choose Give Grip?</h2>
-            <p class="section-subtitle">
-                We're committed to making charitable giving accessible, transparent, and impactful
-            </p>
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">Why Choose GiveGrip?</h2>
+                <p class="text-muted lead">Discover what makes our platform the trusted choice for crowdfunding</p>
+            </div>
         </div>
         
-        <div class="features-grid">
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
+        <div class="row">
+            {% for feature in features %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="{{ feature.icon }}"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">{{ feature.title }}</h4>
+                    <p class="text-muted">{{ feature.description }}</p>
                 </div>
-                <h3>Secure & Trusted</h3>
-                <p>Bank-level security with SSL encryption and PCI compliance. Your data and donations are always protected.</p>
             </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Transparent Tracking</h3>
-                <p>See exactly how your donations are used with real-time updates and detailed reporting.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile First</h3>
-                <p>Donate on the go with our mobile-optimized platform. Works seamlessly on all devices.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3>Multiple Payment Options</h3>
-                <p>Support for credit cards, digital wallets, and bank transfers. Choose what works best for you.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-globe-americas"></i>
-                </div>
-                <h3>Global Reach</h3>
-                <p>Support causes worldwide with multi-currency support and international payment processing.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-headset"></i>
-                </div>
-                <h3>24/7 Support</h3>
-                <p>Our dedicated team is here to help with any questions or concerns around the clock.</p>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
-
-<!-- How It Works Section -->
-<section class="section bg-gray-50">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">How It Works</h2>
-            <p class="section-subtitle">
-                Getting started with Give Grip is simple and straightforward
-            </p>
-        </div>
-        
-        <div class="steps-grid">
-            <div class="step-item animate-fade-in">
-                <div class="step-number">1</div>
-                <div class="step-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <h3>Discover Causes</h3>
-                <p>Browse through verified campaigns and find causes that resonate with your values and interests.</p>
-            </div>
-            
-            <div class="step-item animate-fade-in">
-                <div class="step-number">2</div>
-                <div class="step-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <h3>Make a Donation</h3>
-                <p>Choose your amount and payment method. All transactions are secure and encrypted.</p>
-            </div>
-            
-            <div class="step-item animate-fade-in">
-                <div class="step-number">3</div>
-                <div class="step-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3>Track Impact</h3>
-                <p>Receive updates on how your donation is making a difference and see the campaign's progress.</p>
-            </div>
-        </div>
-    </div>
-</section>
+{% endif %}
 
 <!-- Featured Campaigns Section -->
-<section class="section">
+<section class="py-5 bg-light">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Campaigns</h2>
-            <p class="section-subtitle">
-                Support these urgent causes and make an immediate impact
-            </p>
-        </div>
-        
-        <div class="campaigns-grid" id="featured-campaigns">
-            <!-- Campaigns will be loaded dynamically -->
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
-            </div>
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
-            </div>
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">Featured Campaigns</h2>
+                <p class="text-muted lead">Discover inspiring stories and make a real impact in people's lives</p>
             </div>
         </div>
         
-        <div class="text-center mt-8">
-            <a href="{% url 'campaigns' %}" class="btn btn-primary btn-lg">
-                View All Campaigns
-                <i class="fas fa-arrow-right"></i>
+        <div class="row">
+            {% for campaign in featured_campaigns %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="campaign-card h-100">
+                    <div class="position-relative">
+                        {% if campaign.cover_image %}
+                            <img src="{{ campaign.cover_image.url }}" alt="{{ campaign.title }}" class="campaign-image">
+                        {% else %}
+                            <div class="campaign-image d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        {% if campaign.is_featured %}
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-star me-1"></i>Featured
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="campaign-content">
+                        <h5 class="campaign-title">{{ campaign.title }}</h5>
+                        <p class="campaign-description">{{ campaign.description|truncatewords:20 }}</p>
+                        
+                        <div class="campaign-progress">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress_percentage }}%" 
+                                     aria-valuenow="{{ campaign.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">{{ campaign.progress_percentage|floatformat:1 }}% raised</small>
+                                <small class="text-muted">{{ campaign.days_remaining }} days left</small>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-stats">
+                            <div class="stat-item">
+                                <span class="stat-value currency-inr">{{ campaign.collected_amount|floatformat:0 }}</span>
+                                <div class="stat-label">Raised</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value currency-inr">{{ campaign.goal_amount|floatformat:0 }}</span>
+                                <div class="stat-label">Goal</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">{{ campaign.donor_count }}</span>
+                                <div class="stat-label">Donors</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'main_campaigns:campaign_detail' pk=campaign.pk %}" class="btn btn-primary">
+                                <i class="fas fa-heart me-2"></i>Donate Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="py-5">
+                    <i class="fas fa-heart text-muted fa-4x mb-3"></i>
+                    <h4 class="text-muted">No campaigns yet</h4>
+                    <p class="text-muted">Be the first to start a campaign and make a difference!</p>
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Start Your Campaign
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-search me-2"></i>View All Campaigns
             </a>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="section bg-primary">
+<!-- How It Works Section -->
+<section class="py-5 bg-white">
     <div class="container">
-        <div class="cta-content text-center">
-            <h2 class="cta-title">Ready to Make a Difference?</h2>
-            <p class="cta-subtitle">
-                Join our community of changemakers and start supporting causes that matter to you
-            </p>
-            <div class="cta-actions">
-                <a href="{% url 'register' %}" class="btn btn-white btn-lg">
-                    <i class="fas fa-user-plus"></i>
-                    Get Started Today
-                </a>
-                <a href="{% url 'about' %}" class="btn btn-outline-white btn-lg">
-                    <i class="fas fa-info-circle"></i>
-                    Learn More
-                </a>
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">How It Works</h2>
+                <p class="text-muted lead">Three simple steps to make a difference</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                            <i class="fas fa-search fa-3x text-white"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">1. Discover</h4>
+                        <p class="text-muted">Browse through our verified campaigns and find a cause that resonates with your heart.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                            <i class="fas fa-heart fa-3x text-white"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">2. Donate</h4>
+                        <p class="text-muted">Choose your amount and make a secure donation. Every contribution makes a difference.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                            <i class="fas fa-smile fa-3x text-white"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">3. Impact</h4>
+                        <p class="text-muted">Track the progress and see how your donation helps create positive change in someone's life.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">What People Say</h2>
+                <p class="text-muted lead">Real stories from real people whose lives have been changed</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-quote-left text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Sarah Johnson</h6>
+                                <small class="text-muted">Donor</small>
+                            </div>
+                        </div>
+                        <p class="text-muted">"GiveGrip made it so easy to help others. I love being able to see the impact of my donations in real-time."</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-quote-left text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Michael Chen</h6>
+                                <small class="text-muted">Campaign Creator</small>
+                            </div>
+                        </div>
+                        <p class="text-muted">"The support I received through GiveGrip was incredible. It helped me raise funds for my daughter's medical treatment."</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-quote-left text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Emily Rodriguez</h6>
+                                <small class="text-muted">Community Leader</small>
+                            </div>
+                        </div>
+                        <p class="text-muted">"GiveGrip has transformed how our community supports each other. It's more than just fundraising - it's building connections."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-3">Ready to Make a Difference?</h2>
+                <p class="lead mb-4">Join thousands of people who are already helping others through GiveGrip. Every donation counts.</p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-heart me-2"></i>Start Donating
+                    </a>
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>Create Campaign
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+{% if testimonials %}
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">What Our Users Say</h2>
+                <p class="text-muted lead">Hear from people who have made a difference through GiveGrip</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="testimonial-card h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if testimonial.avatar %}
+                            <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ testimonial.name }}</h6>
+                            <p class="text-muted mb-0">{{ testimonial.role }}{% if testimonial.company %}, {{ testimonial.company }}{% endif %}</p>
+                        </div>
+                    </div>
+                    <p class="text-muted">{{ testimonial.content }}</p>
+                    <div class="text-warning">
+                        {% for i in testimonial.rating|times %}
+                            <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQ Section -->
+{% if faqs %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-3">Frequently Asked Questions</h2>
+                <p class="text-muted lead">Find answers to common questions about GiveGrip</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    {% for faq in faqs %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq{{ forloop.counter }}">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                                {{ faq.question }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="faq{{ forloop.counter }}" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ faq.answer }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hero Section Enhancements */
+.floating-hearts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.floating-hearts i {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.3);
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-hearts i:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+.floating-hearts i:nth-child(2) { top: 60%; left: 80%; animation-delay: 2s; }
+.floating-hearts i:nth-child(3) { top: 80%; left: 20%; animation-delay: 4s; }
+.floating-hearts i:nth-child(4) { top: 30%; left: 70%; animation-delay: 1s; }
+.floating-hearts i:nth-child(5) { top: 70%; left: 40%; animation-delay: 3s; }
+
+/* Stats Section */
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 2rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Step Cards */
+.step-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.step-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, var(--secondary-color), var(--warning-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2.5rem;
+}
+
+.step-card h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.step-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Testimonial Cards */
+.testimonial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.testimonial-content {
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-content p {
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-info h5 {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.author-info span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 2;
+}
+
+.cta-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+}
+
+/* Placeholder Image */
+.placeholder-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    font-size: 3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cta-title {
+        font-size: 2rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .step-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate stats numbers
-    animateStats();
-    
-    // Load featured campaigns
-    loadFeaturedCampaigns();
-});
-
-function animateStats() {
+// Animate stats numbers
+function animateNumbers() {
     const statNumbers = document.querySelectorAll('.stat-number');
     
     statNumbers.forEach(stat => {
-        const target = parseInt(stat.dataset.count);
-        const increment = target / 100;
+        const target = parseInt(stat.getAttribute('data-count'));
+        const duration = 2000;
+        const increment = target / (duration / 16);
         let current = 0;
         
         const timer = setInterval(() => {
@@ -263,577 +698,38 @@ function animateStats() {
                 current = target;
                 clearInterval(timer);
             }
-            
-            if (stat.dataset.count.includes('000000')) {
-                stat.textContent = '$' + Math.floor(current / 1000000) + 'M';
-            } else if (stat.dataset.count.includes('000')) {
-                stat.textContent = Math.floor(current / 1000) + 'K';
-            } else {
-                stat.textContent = Math.floor(current);
-            }
-        }, 20);
+            stat.textContent = Math.floor(current).toLocaleString();
+        }, 16);
     });
 }
 
-function loadFeaturedCampaigns() {
-    // Simulate API call to load featured campaigns
-    setTimeout(() => {
-        const campaignsContainer = document.getElementById('featured-campaigns');
-        campaignsContainer.innerHTML = `
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-1.jpg' %}" alt="Emergency Relief Fund" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge urgent">Urgent</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Emergency Relief Fund</h3>
-                    <p class="campaign-description">Providing immediate assistance to communities affected by natural disasters.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$75,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Disaster Relief</span>
-                        <span class="campaign-deadline">5 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(1)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(1)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-2.jpg' %}" alt="Education for All" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge">Featured</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Education for All</h3>
-                    <p class="campaign-description">Building schools and providing educational resources in underserved communities.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 45%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$45,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Education</span>
-                        <span class="campaign-deadline">15 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(2)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(2)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-3.jpg' %}" alt="Clean Water Initiative" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge">Popular</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Clean Water Initiative</h3>
-                    <p class="campaign-description">Installing water purification systems in rural villages to provide clean, safe drinking water.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 90%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$90,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Health</span>
-                        <span class="campaign-deadline">2 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(3)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(3)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }, 1000);
+// Intersection Observer for stats animation
+const statsSection = document.querySelector('.stats-section');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateNumbers();
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+if (statsSection) {
+    observer.observe(statsSection);
 }
 
-function handleDonateClick(campaignId) {
-    // This would typically open a donation modal
-    if (window.GiveGrip && window.GiveGrip.showNotification) {
-        window.GiveGrip.showNotification(`Donation modal for campaign ${campaignId} would open here`, 'info');
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+    const navbar = document.getElementById('mainNav');
+    if (window.scrollY > 100) {
+        navbar.classList.add('scrolled');
     } else {
-        alert(`Donation modal for campaign ${campaignId} would open here`);
+        navbar.classList.remove('scrolled');
     }
-}
-
-function handleShareClick(campaignId) {
-    const url = window.location.href;
-    const text = `Check out this campaign on Give Grip!`;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: 'Give Grip Campaign',
-            text: text,
-            url: url
-        });
-    } else {
-        navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-            if (window.GiveGrip && window.GiveGrip.showNotification) {
-                window.GiveGrip.showNotification('Campaign link copied to clipboard!', 'success');
-            } else {
-                alert('Campaign link copied to clipboard!');
-            }
-        });
-    }
-}
-</script>
-{% endblock %}
-
-
-
-
-{% block title %}Give Grip - Secure Donation Platform{% endblock %}
-
-{% block content %}
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title animate-fade-in">
-                Make a Difference<br>
-                <span class="text-gradient">One Donation at a Time</span>
-            </h1>
-            <p class="hero-subtitle animate-fade-in">
-                Join thousands of people making positive change through secure, transparent donations. 
-                Support causes you care about with our trusted platform.
-            </p>
-            <div class="hero-actions animate-fade-in">
-                <a href="{% url 'campaigns' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-heart"></i>
-                    Explore Campaigns
-                </a>
-                <a href="{% url 'create_campaign' %}" class="btn btn-outline btn-lg">
-                    <i class="fas fa-plus"></i>
-                    Start a Campaign
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Stats Section -->
-<section class="section bg-gray-50">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-number" data-count="50000">0</div>
-                <div class="stat-label">Active Donors</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-hand-holding-heart"></i>
-                </div>
-                <div class="stat-number" data-count="2500000">0</div>
-                <div class="stat-label">Total Raised</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-bullseye"></i>
-                </div>
-                <div class="stat-number" data-count="1500">0</div>
-                <div class="stat-label">Campaigns</div>
-            </div>
-            <div class="stat-item animate-fade-in">
-                <div class="stat-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="stat-number" data-count="45">0</div>
-                <div class="stat-label">Countries</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Why Choose Give Grip?</h2>
-            <p class="section-subtitle">
-                We're committed to making charitable giving accessible, transparent, and impactful
-            </p>
-        </div>
-        
-        <div class="features-grid">
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Secure & Trusted</h3>
-                <p>Bank-level security with SSL encryption and PCI compliance. Your data and donations are always protected.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Transparent Tracking</h3>
-                <p>See exactly how your donations are used with real-time updates and detailed reporting.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Mobile First</h3>
-                <p>Donate on the go with our mobile-optimized platform. Works seamlessly on all devices.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3>Multiple Payment Options</h3>
-                <p>Support for credit cards, digital wallets, and bank transfers. Choose what works best for you.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-globe-americas"></i>
-                </div>
-                <h3>Global Reach</h3>
-                <p>Support causes worldwide with multi-currency support and international payment processing.</p>
-            </div>
-            
-            <div class="feature-card animate-fade-in">
-                <div class="feature-icon">
-                    <i class="fas fa-headset"></i>
-                </div>
-                <h3>24/7 Support</h3>
-                <p>Our dedicated team is here to help with any questions or concerns around the clock.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="section bg-gray-50">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">How It Works</h2>
-            <p class="section-subtitle">
-                Getting started with Give Grip is simple and straightforward
-            </p>
-        </div>
-        
-        <div class="steps-grid">
-            <div class="step-item animate-fade-in">
-                <div class="step-number">1</div>
-                <div class="step-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <h3>Discover Causes</h3>
-                <p>Browse through verified campaigns and find causes that resonate with your values and interests.</p>
-            </div>
-            
-            <div class="step-item animate-fade-in">
-                <div class="step-number">2</div>
-                <div class="step-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <h3>Make a Donation</h3>
-                <p>Choose your amount and payment method. All transactions are secure and encrypted.</p>
-            </div>
-            
-            <div class="step-item animate-fade-in">
-                <div class="step-number">3</div>
-                <div class="step-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3>Track Impact</h3>
-                <p>Receive updates on how your donation is making a difference and see the campaign's progress.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Featured Campaigns Section -->
-<section class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Campaigns</h2>
-            <p class="section-subtitle">
-                Support these urgent causes and make an immediate impact
-            </p>
-        </div>
-        
-        <div class="campaigns-grid" id="featured-campaigns">
-            <!-- Campaigns will be loaded dynamically -->
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
-            </div>
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
-            </div>
-            <div class="campaign-skeleton">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-content">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-text"></div>
-                    <div class="skeleton-progress"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center mt-8">
-            <a href="{% url 'campaigns' %}" class="btn btn-primary btn-lg">
-                View All Campaigns
-                <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="section bg-primary">
-    <div class="container">
-        <div class="cta-content text-center">
-            <h2 class="cta-title">Ready to Make a Difference?</h2>
-            <p class="cta-subtitle">
-                Join our community of changemakers and start supporting causes that matter to you
-            </p>
-            <div class="cta-actions">
-                <a href="{% url 'register' %}" class="btn btn-white btn-lg">
-                    <i class="fas fa-user-plus"></i>
-                    Get Started Today
-                </a>
-                <a href="{% url 'about' %}" class="btn btn-outline-white btn-lg">
-                    <i class="fas fa-info-circle"></i>
-                    Learn More
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate stats numbers
-    animateStats();
-    
-    // Load featured campaigns
-    loadFeaturedCampaigns();
 });
-
-function animateStats() {
-    const statNumbers = document.querySelectorAll('.stat-number');
-    
-    statNumbers.forEach(stat => {
-        const target = parseInt(stat.dataset.count);
-        const increment = target / 100;
-        let current = 0;
-        
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            
-            if (stat.dataset.count.includes('000000')) {
-                stat.textContent = '$' + Math.floor(current / 1000000) + 'M';
-            } else if (stat.dataset.count.includes('000')) {
-                stat.textContent = Math.floor(current / 1000) + 'K';
-            } else {
-                stat.textContent = Math.floor(current);
-            }
-        }, 20);
-    });
-}
-
-function loadFeaturedCampaigns() {
-    // Simulate API call to load featured campaigns
-    setTimeout(() => {
-        const campaignsContainer = document.getElementById('featured-campaigns');
-        campaignsContainer.innerHTML = `
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-1.jpg' %}" alt="Emergency Relief Fund" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge urgent">Urgent</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Emergency Relief Fund</h3>
-                    <p class="campaign-description">Providing immediate assistance to communities affected by natural disasters.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$75,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Disaster Relief</span>
-                        <span class="campaign-deadline">5 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(1)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(1)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-2.jpg' %}" alt="Education for All" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge">Featured</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Education for All</h3>
-                    <p class="campaign-description">Building schools and providing educational resources in underserved communities.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 45%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$45,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Education</span>
-                        <span class="campaign-deadline">15 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(2)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(2)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="campaign-card">
-                <div class="campaign-image">
-                    <img src="{% static 'images/campaign-3.jpg' %}" alt="Clean Water Initiative" onerror="this.src='{% static 'images/default-campaign.jpg' %}'">
-                    <div class="campaign-badge">Popular</div>
-                </div>
-                <div class="campaign-content">
-                    <h3 class="campaign-title">Clean Water Initiative</h3>
-                    <p class="campaign-description">Installing water purification systems in rural villages to provide clean, safe drinking water.</p>
-                    <div class="campaign-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 90%"></div>
-                        </div>
-                        <div class="campaign-stats">
-                            <span class="current-amount">$90,000</span>
-                            <span class="goal-amount">$100,000</span>
-                        </div>
-                    </div>
-                    <div class="campaign-meta">
-                        <span class="campaign-category">Health</span>
-                        <span class="campaign-deadline">2 days left</span>
-                    </div>
-                    <div class="campaign-actions">
-                        <button class="btn btn-primary" onclick="handleDonateClick(3)">
-                            <i class="fas fa-heart"></i>
-                            Donate Now
-                        </button>
-                        <button class="btn btn-outline" onclick="handleShareClick(3)">
-                            <i class="fas fa-share"></i>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }, 1000);
-}
-
-function handleDonateClick(campaignId) {
-    // This would typically open a donation modal
-    if (window.GiveGrip && window.GiveGrip.showNotification) {
-        window.GiveGrip.showNotification(`Donation modal for campaign ${campaignId} would open here`, 'info');
-    } else {
-        alert(`Donation modal for campaign ${campaignId} would open here`);
-    }
-}
-
-function handleShareClick(campaignId) {
-    const url = window.location.href;
-    const text = `Check out this campaign on Give Grip!`;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: 'Give Grip Campaign',
-            text: text,
-            url: url
-        });
-    } else {
-        navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-            if (window.GiveGrip && window.GiveGrip.showNotification) {
-                window.GiveGrip.showNotification('Campaign link copied to clipboard!', 'success');
-            } else {
-                alert('Campaign link copied to clipboard!');
-            }
-        });
-    }
-}
 </script>
 {% endblock %}
+
+
 
 

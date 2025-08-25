@@ -1,143 +1,248 @@
 
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Contact Us - Give Grip{% endblock %}
+{% block title %}Contact Us - GiveGrip{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<section class="page-header">
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary text-white py-5">
     <div class="container">
-        <div class="page-header-content">
-            <h1>Contact Us</h1>
-            <p>Get in touch with our team. We're here to help and answer any questions you may have.</p>
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Get in Touch</h1>
+                <p class="lead mb-4">Have questions? We're here to help! Reach out to our team and we'll get back to you as soon as possible.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock me-2"></i>
+                        <span>24/7 Support</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <span>Secure & Private</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-heart me-2"></i>
+                        <span>Dedicated Team</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image">
+                    <i class="fas fa-headset fa-8x text-white-50"></i>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Contact Section -->
-<section class="contact">
+<!-- Contact Form & Info Section -->
+<section class="py-5">
     <div class="container">
-        <div class="contact-content">
-            <div class="contact-info">
-                <h2>Get in Touch</h2>
-                <p>
-                    Have questions about Give Grip? Want to learn more about how to get involved? 
-                    Or maybe you need help with your donation? We're here to help!
-                </p>
-                
-                <div class="contact-methods">
-                    <div class="contact-method">
-                        <div class="method-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="method-details">
-                            <h3>Email Us</h3>
-                            <p>support@givegrip.com</p>
-                            <span>We typically respond within 24 hours</span>
-                        </div>
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-primary text-white py-4">
+                        <h3 class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>Send us a Message
+                        </h3>
                     </div>
-                    
-                    <div class="contact-method">
-                        <div class="method-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="method-details">
-                            <h3>Call Us</h3>
-                            <p>+1 (555) 123-4567</p>
-                            <span>Monday - Friday, 9 AM - 6 PM EST</span>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-method">
-                        <div class="method-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="method-details">
-                            <h3>Live Chat</h3>
-                            <p>Available on our website</p>
-                            <span>Get instant help during business hours</span>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-method">
-                        <div class="method-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="method-details">
-                            <h3>Visit Us</h3>
-                            <p>123 Charity Way, Suite 100</p>
-                            <span>New York, NY 10001, USA</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="social-links">
-                    <h3>Follow Us</h3>
-                    <div class="social-icons">
-                        <a href="#" class="social-link" aria-label="Facebook">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="social-link" aria-label="Twitter">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="social-link" aria-label="LinkedIn">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
+                    <div class="card-body p-5">
+                        <!-- Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="name" class="form-label fw-bold">
+                                        <i class="fas fa-user me-2"></i>Full Name *
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="name" name="name" 
+                                           placeholder="Enter your full name" required>
+                                    <div class="invalid-feedback">
+                                        Please enter your full name.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="email" class="form-label fw-bold">
+                                        <i class="fas fa-envelope me-2"></i>Email Address *
+                                    </label>
+                                    <input type="email" class="form-control form-control-lg" id="email" name="email" 
+                                           placeholder="Enter your email address" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid email address.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="phone" class="form-label fw-bold">
+                                        <i class="fas fa-phone me-2"></i>Phone Number
+                                    </label>
+                                    <input type="tel" class="form-control form-control-lg" id="phone" name="phone" 
+                                           placeholder="Enter your phone number">
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="subject" class="form-label fw-bold">
+                                        <i class="fas fa-tag me-2"></i>Subject *
+                                    </label>
+                                    <select class="form-select form-select-lg" id="subject" name="subject" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="support">Technical Support</option>
+                                        <option value="donation">Donation Question</option>
+                                        <option value="campaign">Campaign Information</option>
+                                        <option value="partnership">Partnership Opportunity</option>
+                                        <option value="feedback">Feedback & Suggestions</option>
+                                        <option value="bug">Report a Bug</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a subject.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="message" class="form-label fw-bold">
+                                    <i class="fas fa-comment me-2"></i>Message *
+                                </label>
+                                <textarea class="form-control" id="message" name="message" rows="6" 
+                                          placeholder="Tell us how we can help you..." required></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter your message.
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                                    <label class="form-check-label" for="newsletter">
+                                        I'd like to receive updates about GiveGrip and charitable giving opportunities
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            
-            <div class="contact-form-container">
-                <div class="contact-form-card">
-                    <h3>Send us a Message</h3>
-                    <p>Fill out the form below and we'll get back to you as soon as possible.</p>
-                    
-                    <form id="contactForm" class="contact-form">
-                        <div class="form-group">
-                            <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" required>
+
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <!-- Quick Contact Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Quick Contact
+                        </h5>
+                        
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Email Us</h6>
+                                    <p class="mb-0 text-muted">support@givegrip.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Call Us</h6>
+                                    <p class="mb-0 text-muted">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="contact-icon bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Visit Us</h6>
+                                    <p class="mb-0 text-muted">123 Charity Way, Suite 100<br>New York, NY 10001</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Office Hours -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-clock me-2"></i>Office Hours
+                        </h5>
+                        
+                        <div class="hours-item d-flex justify-content-between mb-2">
+                            <span>Monday - Friday</span>
+                            <span class="fw-bold">9:00 AM - 6:00 PM</span>
+                        </div>
+                        <div class="hours-item d-flex justify-content-between mb-2">
+                            <span>Saturday</span>
+                            <span class="fw-bold">10:00 AM - 4:00 PM</span>
+                        </div>
+                        <div class="hours-item d-flex justify-content-between mb-3">
+                            <span>Sunday</span>
+                            <span class="fw-bold text-muted">Closed</span>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            For urgent matters outside business hours, please email us.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-share-alt me-2"></i>Follow Us
+                        </h5>
                         
-                        <div class="form-group">
-                            <label for="subject">Subject *</label>
-                            <select id="subject" name="subject" required>
-                                <option value="">Select a subject</option>
-                                <option value="general">General Inquiry</option>
-                                <option value="support">Technical Support</option>
-                                <option value="donation">Donation Question</option>
-                                <option value="campaign">Campaign Information</option>
-                                <option value="partnership">Partnership Opportunity</option>
-                                <option value="feedback">Feedback</option>
-                                <option value="other">Other</option>
-                            </select>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="social-link bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Message *</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Tell us how we can help you..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="newsletter" id="newsletter">
-                                <span class="checkmark"></span>
-                                I'd like to receive updates about Give Grip and charitable giving opportunities
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-full">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Message
-                        </button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,157 +250,149 @@
 </section>
 
 <!-- FAQ Section -->
-<section class="faq-section">
+<section class="bg-light py-5">
     <div class="container">
-        <div class="section-header">
-            <h2>Frequently Asked Questions</h2>
-            <p>Quick answers to common questions</p>
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Frequently Asked Questions</h2>
+            <p class="text-muted">Quick answers to common questions</p>
         </div>
         
-        <div class="faq-grid">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>How do I make a donation?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Making a donation is easy! Simply browse our campaigns, choose one you'd like to support, click "Donate Now," and follow the secure payment process.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>Is my donation secure?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Absolutely! We use bank-level security with SSL encryption and PCI compliance. Your financial information is never stored on our servers.</p>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="faq-item card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-question-circle text-primary me-2"></i>
+                            How do I make a donation?
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Making a donation is easy! Simply browse our campaigns, choose one you'd like to support, 
+                            click "Donate Now," and follow the secure payment process.
+                        </p>
+                    </div>
                 </div>
             </div>
             
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>Can I make anonymous donations?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Yes, you can choose to make anonymous donations. Your name won't be displayed publicly, but we'll still send you a receipt for tax purposes.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>How do I get a receipt for my donation?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>You'll receive an email receipt immediately after your donation is processed. You can also access all your donation receipts in your account dashboard.</p>
+            <div class="col-lg-6">
+                <div class="faq-item card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            Is my donation secure?
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Absolutely! We use bank-level security with SSL encryption and PCI compliance. 
+                            Your financial information is never stored on our servers.
+                        </p>
+                    </div>
                 </div>
             </div>
             
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>What payment methods do you accept?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>We accept all major credit cards (Visa, MasterCard, American Express, Discover), PayPal, and bank transfers for larger donations.</p>
+            <div class="col-lg-6">
+                <div class="faq-item card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-user-secret text-warning me-2"></i>
+                            Can I make anonymous donations?
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Yes, you can choose to make anonymous donations. Your name won't be displayed publicly, 
+                            but we'll still send you a receipt for tax purposes.
+                        </p>
+                    </div>
                 </div>
             </div>
             
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h3>How do I know my donation reaches the intended cause?</h3>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>We provide real-time updates and detailed reporting on how funds are used. You can track the progress of campaigns and see the impact of your donation.</p>
+            <div class="col-lg-6">
+                <div class="faq-item card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-receipt text-info me-2"></i>
+                            How do I get a receipt for my donation?
+                        </h5>
+                        <p class="text-muted mb-0">
+                            You'll receive an email receipt immediately after your donation is processed. 
+                            You can also access all your donation receipts in your account dashboard.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="faq-actions">
-            <p>Still have questions? <a href="#contactForm">Send us a message</a> or check out our <a href="{% url 'faq' %}">full FAQ page</a>.</p>
+        <div class="text-center mt-5">
+            <a href="{% url 'pages:faq' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-question-circle me-2"></i>View All FAQs
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Office Hours Section -->
-<section class="office-hours">
+<!-- CTA Section -->
+<section class="bg-primary text-white py-5">
     <div class="container">
-        <div class="office-hours-content">
-            <div class="hours-info">
-                <h2>Office Hours</h2>
-                <p>Our team is available to help you during these hours:</p>
-                
-                <div class="hours-grid">
-                    <div class="hours-day">
-                        <span class="day">Monday - Friday</span>
-                        <span class="time">9:00 AM - 6:00 PM EST</span>
-                    </div>
-                    <div class="hours-day">
-                        <span class="day">Saturday</span>
-                        <span class="time">10:00 AM - 4:00 PM EST</span>
-                    </div>
-                    <div class="hours-day">
-                        <span class="day">Sunday</span>
-                        <span class="time">Closed</span>
-                    </div>
-                </div>
-                
-                <p class="hours-note">
-                    <strong>Note:</strong> For urgent matters outside of business hours, please email us and we'll respond as soon as possible.
-                </p>
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Ready to Make a Difference?</h3>
+                <p class="lead mb-0">Join thousands of people who are already making an impact through GiveGrip.</p>
             </div>
-            
-            <div class="hours-visual">
-                <div class="hours-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'main_campaigns:campaign_list' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-heart me-2"></i>Browse Campaigns
+                </a>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
 
-{% block extra_js %}
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+.contact-item:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease;
+}
+
+.social-link:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.hero-image {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+</style>
+
 <script>
-// FAQ accordion functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        const answer = item.querySelector('.faq-answer');
-        
-        question.addEventListener('click', function() {
-            const isOpen = item.classList.contains('active');
-            
-            // Close all other FAQ items
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
-                }
-            });
-            
-            // Toggle current item
-            item.classList.toggle('active');
-        });
-    });
-});
-
-// Smooth scroll to contact form
-document.querySelectorAll('a[href="#contactForm"]').forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const form = document.getElementById('contactForm');
-        if (form) {
-            form.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
         }
+        form.classList.add('was-validated');
     });
+
+    // Auto-focus on first input
+    document.getElementById('name').focus();
 });
 </script>
 {% endblock %}

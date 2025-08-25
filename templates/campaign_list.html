@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Campaigns - GiveGrip{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="section bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 mb-3">Active Campaigns</h1>
+                <p class="lead text-muted">Discover meaningful causes and make a difference today</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Campaigns Section -->
+<section class="section">
+    <div class="container">
+        <!-- Search and Filter -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search campaigns..." id="searchInput">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Create Campaign
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Campaigns Grid -->
+        <div class="row" id="campaignsGrid">
+            {% for campaign in campaigns %}
+            <div class="col-lg-4 col-md-6 mb-4 campaign-item">
+                <div class="campaign-card h-100">
+                    {% if campaign.cover_image %}
+                        <div class="campaign-image">
+                            <img src="{{ campaign.cover_image.url }}" alt="{{ campaign.title }}" class="img-fluid">
+                        </div>
+                    {% else %}
+                        <div class="campaign-image">
+                            <div class="placeholder-image d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if campaign.is_featured %}
+                        <div class="campaign-badge">Featured</div>
+                    {% endif %}
+                    
+                    <div class="campaign-content">
+                        <h3 class="campaign-title">{{ campaign.title }}</h3>
+                        <p class="campaign-description">{{ campaign.description|truncatewords:20 }}</p>
+                        
+                        <div class="campaign-progress mb-3">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ campaign.progress_percentage }}%" 
+                                     aria-valuenow="{{ campaign.progress_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-stats mb-3">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="stat-number text-primary">${{ campaign.collected_amount|floatformat:0 }}</div>
+                                    <div class="stat-label text-muted">Raised</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-number text-success">{{ campaign.progress_percentage|floatformat:1 }}%</div>
+                                    <div class="stat-label text-muted">Goal</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-meta mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Created {{ campaign.created_at|timesince }} ago
+                            </small>
+                        </div>
+                        
+                        <a href="{% url 'main_campaigns:campaign_detail' pk=campaign.pk %}" class="btn btn-primary w-100">
+                            <i class="fas fa-heart me-2"></i>Support This Cause
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="empty-state py-5">
+                    <i class="fas fa-heart-broken fa-3x text-muted mb-3"></i>
+                    <h4>No campaigns available</h4>
+                    <p class="text-muted">Check back soon for new fundraising campaigns!</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create First Campaign
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Campaign pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section bg-primary text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2>Ready to Make a Difference?</h2>
+                <p class="lead">Join thousands of people who are already changing the world through generosity</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'main_campaigns:create_campaign' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>Start Your Campaign
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Join GiveGrip
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Simple search functionality
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const campaignItems = document.querySelectorAll('.campaign-item');
+    
+    campaignItems.forEach(item => {
+        const title = item.querySelector('.campaign-title').textContent.toLowerCase();
+        const description = item.querySelector('.campaign-description').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}
+
+

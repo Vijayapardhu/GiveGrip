@@ -1,9 +1,22 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
-app_name = 'users'
+router = DefaultRouter()
+router.register(r'users', views.UserViewSet)
+router.register(r'profiles', views.UserProfileViewSet, basename='profile')
 
 urlpatterns = [
+    # Router URLs
+    path('', include(router.urls)),
+    
+    # Custom endpoints
+    path('register/', views.UserRegistrationView.as_view(), name='user-register'),
+    path('stats/', views.UserStatsView.as_view(), name='user-stats'),
+]
+
+
+
     # Authentication endpoints
     path('auth/register/', views.UserRegistrationView.as_view(), name='register'),
     path('auth/login/', views.UserLoginView.as_view(), name='login'),

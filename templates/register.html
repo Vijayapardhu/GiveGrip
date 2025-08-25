@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-plus fa-2x text-white"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2">Join GiveGrip</h2>
+                        <p class="text-muted">Create your account and start making a difference today</p>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Registration Form -->
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="first_name" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>First Name
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="first_name" name="first_name" 
+                                       placeholder="Enter your first name" required>
+                                <div class="invalid-feedback">
+                                    Please enter your first name.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="last_name" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>Last Name
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="last_name" name="last_name" 
+                                       placeholder="Enter your last name" required>
+                                <div class="invalid-feedback">
+                                    Please enter your last name.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="username" class="form-label fw-bold">
+                                <i class="fas fa-at me-2"></i>Username
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" 
+                                   placeholder="Choose a unique username" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>Username must be unique and contain only letters, numbers, and underscores.
+                            </div>
+                            <div class="invalid-feedback">
+                                Please choose a valid username.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-bold">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control form-control-lg" id="email" name="email" 
+                                   placeholder="Enter your email address" required>
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="phone" class="form-label fw-bold">
+                                <i class="fas fa-phone me-2"></i>Phone Number
+                            </label>
+                            <input type="tel" class="form-control form-control-lg" id="phone" name="phone" 
+                                   placeholder="Enter your phone number" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>We'll send you a verification code to this number.
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a valid phone number.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password1" class="form-label fw-bold">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <input type="password" class="form-control" id="password1" name="password1" 
+                                       placeholder="Create a strong password" required>
+                                <button class="btn btn-outline-secondary password-toggle" type="button" aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted" id="passwordFeedback">Password strength indicator</small>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please create a strong password.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password2" class="form-label fw-bold">
+                                <i class="fas fa-lock me-2"></i>Confirm Password
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <input type="password" class="form-control" id="password2" name="password2" 
+                                       placeholder="Confirm your password" required>
+                                <button class="btn btn-outline-secondary password-toggle" type="button" aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Passwords do not match.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="{% url 'pages:terms_of_service' %}" class="text-decoration-none">Terms of Service</a> 
+                                    and <a href="{% url 'pages:privacy_policy' %}" class="text-decoration-none">Privacy Policy</a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                                <label class="form-check-label" for="newsletter">
+                                    I want to receive updates about campaigns and opportunities to make a difference
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative">
+                            <hr class="my-4">
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                or sign up with
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Social Registration -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100 py-3" type="button">
+                                <i class="fab fa-google me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100 py-3" type="button">
+                                <i class="fab fa-facebook-f me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold text-primary">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits -->
+            <div class="row mt-5">
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-heart text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Make a Difference</h5>
+                        <p class="text-muted small">Support causes you care about and help people in need</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Secure & Transparent</h5>
+                        <p class="text-muted small">Your donations are secure and you can track their impact</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Join Community</h5>
+                        <p class="text-muted small">Connect with like-minded people and share your impact</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        // Check password match
+        if (password1.value !== password2.value) {
+            password2.setCustomValidity('Passwords do not match');
+            event.preventDefault();
+        } else {
+            password2.setCustomValidity('');
+        }
+        
+        form.classList.add('was-validated');
+    });
+
+    // Password strength indicator
+    password1.addEventListener('input', function() {
+        const password = this.value;
+        const strength = calculatePasswordStrength(password);
+        updatePasswordStrengthIndicator(strength);
+    });
+
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    });
+
+    // Real-time password confirmation
+    password2.addEventListener('input', function() {
+        if (this.value !== password1.value) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Auto-focus on first input
+    document.getElementById('first_name').focus();
+});
+
+function calculatePasswordStrength(password) {
+    let score = 0;
+    
+    if (password.length >= 8) score += 1;
+    if (password.match(/[a-z]/)) score += 1;
+    if (password.match(/[A-Z]/)) score += 1;
+    if (password.match(/[0-9]/)) score += 1;
+    if (password.match(/[^a-zA-Z0-9]/)) score += 1;
+    
+    return score;
+}
+
+function updatePasswordStrengthIndicator(strength) {
+    const strengthBar = document.getElementById('passwordStrength');
+    const feedback = document.getElementById('passwordFeedback');
+    
+    let color, text, width;
+    
+    switch (strength) {
+        case 0:
+        case 1:
+            color = 'bg-danger';
+            text = 'Very weak';
+            width = '20%';
+            break;
+        case 2:
+            color = 'bg-warning';
+            text = 'Weak';
+            width = '40%';
+            break;
+        case 3:
+            color = 'bg-info';
+            text = 'Fair';
+            width = '60%';
+            break;
+        case 4:
+            color = 'bg-primary';
+            text = 'Good';
+            width = '80%';
+            break;
+        case 5:
+            color = 'bg-success';
+            text = 'Strong';
+            width = '100%';
+            break;
+        default:
+            color = 'bg-secondary';
+            text = 'Password strength indicator';
+            width = '0%';
+    }
+    
+    strengthBar.className = `progress-bar ${color}`;
+    strengthBar.style.width = width;
+    feedback.textContent = text;
+}
+</script>
+{% endblock %}
+
+

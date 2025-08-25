@@ -1,0 +1,76 @@
+
+{% load static %}
+
+{% block title %}Help Center - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">Help Center</h1>
+                <p class="lead">Get the support you need to make the most of GiveGrip</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-question-circle text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center">FAQ</h4>
+                            <p class="card-text">Find answers to frequently asked questions about using GiveGrip.</p>
+                            <div class="text-center">
+                                <a href="{% url 'pages:faq' %}" class="btn btn-outline-primary">View FAQ</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-envelope text-success" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center">Contact Support</h4>
+                            <p class="card-text">Get in touch with our support team for personalized assistance.</p>
+                            <div class="text-center">
+                                <a href="{% url 'pages:contact' %}" class="btn btn-outline-success">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <h3 class="text-center mb-4">Quick Help Topics</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-user-plus text-info mb-3" style="font-size: 2rem;"></i>
+                            <h5>Getting Started</h5>
+                            <p class="text-muted">Learn how to create an account and start using GiveGrip.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-heart text-danger mb-3" style="font-size: 2rem;"></i>
+                            <h5>Creating Campaigns</h5>
+                            <p class="text-muted">Step-by-step guide to creating successful fundraising campaigns.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-credit-card text-warning mb-3" style="font-size: 2rem;"></i>
+                            <h5>Payment Issues</h5>
+                            <p class="text-muted">Troubleshoot payment problems and donation issues.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,20 @@
-from django.shortcuts import render, redirect
+"""
+Custom view handlers for GiveGrip project.
+"""
+from django.shortcuts import render
+from django.http import HttpResponseNotFound, HttpResponseServerError
+
+
+def custom_404(request, exception):
+    """Custom 404 error page."""
+    return render(request, '404.html', status=404)
+
+
+def custom_500(request):
+    """Custom 500 error page."""
+    return render(request, '500.html', status=500)
+
+
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse

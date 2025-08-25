@@ -1,574 +1,6 @@
-/* ===== GIVE GRIP - MODERN JAVASCRIPT FRAMEWORK ===== */
-
-// Global variables
+// ===== GLOBAL VARIABLES =====
 let isLoading = false;
-let currentUser = null;
-
-// DOM Content Loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
-
-// Initialize Application
-function initializeApp() {
-    setupEventListeners();
-    setupAnimations();
-    setupScrollEffects();
-    setupMobileNavigation();
-    setupUserMenu();
-    setupBackToTop();
-    setupLoadingSpinner();
-    
-    // Check if user is authenticated
-    checkAuthentication();
-    
-    // Initialize tooltips and other UI components
-    initializeUIComponents();
-}
-
-// ===== EVENT LISTENERS =====
-function setupEventListeners() {
-    // Form submissions
-    document.addEventListener('submit', handleFormSubmission);
-    
-    // Input focus effects
-    document.addEventListener('focusin', handleInputFocus);
-    document.addEventListener('focusout', handleInputBlur);
-    
-    // Button clicks
-    document.addEventListener('click', handleButtonClicks);
-    
-    // Window events
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-}
-
-// ===== FORM HANDLING =====
-function handleFormSubmission(event) {
-    const form = event.target;
-    const formType = form.dataset.formType;
-    
-    if (formType === 'donation') {
-        event.preventDefault();
-        handleDonationForm(form);
-    } else if (formType === 'contact') {
-        event.preventDefault();
-        handleContactForm(form);
-    } else if (formType === 'campaign') {
-        event.preventDefault();
-        handleCampaignForm(form);
-    }
-}
-
-function handleDonationForm(form) {
-    const formData = new FormData(form);
-    const amount = formData.get('amount');
-    const campaignId = formData.get('campaign_id');
-    
-    if (!amount || amount <= 0) {
-        showNotification('Please enter a valid donation amount', 'error');
-        return;
-    }
-    
-    showLoadingSpinner();
-    
-    // Simulate API call
-    setTimeout(() => {
-        hideLoadingSpinner();
-        showNotification('Thank you for your donation!', 'success');
-        form.reset();
-        
-        // Update campaign progress
-        updateCampaignProgress(campaignId, amount);
-    }, 2000);
-}
-
-function handleContactForm(form) {
-    const formData = new FormData(form);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const message = formData.get('message');
-    
-    if (!name || !email || !message) {
-        showNotification('Please fill in all fields', 'error');
-        return;
-    }
-    
-    showLoadingSpinner();
-    
-    // Simulate API call
-    setTimeout(() => {
-        hideLoadingSpinner();
-        showNotification('Message sent successfully!', 'success');
-        form.reset();
-    }, 1500);
-}
-
-function handleCampaignForm(form) {
-    const formData = new FormData(form);
-    const title = formData.get('title');
-    const description = formData.get('description');
-    const goal = formData.get('goal');
-    
-    if (!title || !description || !goal) {
-        showNotification('Please fill in all required fields', 'error');
-        return;
-    }
-    
-    showLoadingSpinner();
-    
-    // Simulate API call
-    setTimeout(() => {
-        hideLoadingSpinner();
-        showNotification('Campaign created successfully!', 'success');
-        form.reset();
-        
-        // Redirect to campaigns page
-        setTimeout(() => {
-            window.location.href = '/campaigns/';
-        }, 1000);
-    }, 2000);
-}
-
-// ===== INPUT HANDLING =====
-function handleInputFocus(event) {
-    const input = event.target;
-    const formGroup = input.closest('.form-group');
-    
-    if (formGroup) {
-        formGroup.classList.add('focused');
-    }
-}
-
-function handleInputBlur(event) {
-    const input = event.target;
-    const formGroup = input.closest('.form-group');
-    
-    if (formGroup) {
-        formGroup.classList.remove('focused');
-        
-        // Validate input
-        validateInput(input);
-    }
-}
-
-function validateInput(input) {
-    const value = input.value.trim();
-    const type = input.type;
-    const required = input.hasAttribute('required');
-    
-    // Remove existing error states
-    removeInputError(input);
-    
-    // Check required fields
-    if (required && !value) {
-        showInputError(input, 'This field is required');
-        return false;
-    }
-    
-    // Validate email
-    if (type === 'email' && value) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-            showInputError(input, 'Please enter a valid email address');
-            return false;
-        }
-    }
-    
-    // Validate phone
-    if (input.name === 'phone' && value) {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        if (!phoneRegex.test(value.replace(/\s/g, ''))) {
-            showInputError(input, 'Please enter a valid phone number');
-            return false;
-        }
-    }
-    
-    // Validate amount
-    if (input.name === 'amount' && value) {
-        const amount = parseFloat(value);
-        if (isNaN(amount) || amount <= 0) {
-            showInputError(input, 'Please enter a valid amount');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-function showInputError(input, message) {
-    const formGroup = input.closest('.form-group');
-    const errorElement = document.createElement('div');
-    errorElement.className = 'form-error';
-    errorElement.textContent = message;
-    
-    formGroup.appendChild(errorElement);
-    input.classList.add('error');
-}
-
-function removeInputError(input) {
-    const formGroup = input.closest('.form-group');
-    const errorElement = formGroup.querySelector('.form-error');
-    
-    if (errorElement) {
-        errorElement.remove();
-    }
-    
-    input.classList.remove('error');
-}
-
-// ===== BUTTON HANDLING =====
-function handleButtonClicks(event) {
-    const button = event.target.closest('button');
-    if (!button) return;
-    
-    const action = button.dataset.action;
-    
-    switch (action) {
-        case 'donate':
-            handleDonateClick(button);
-            break;
-        case 'share':
-            handleShareClick(button);
-            break;
-        case 'follow':
-            handleFollowClick(button);
-            break;
-        case 'like':
-            handleLikeClick(button);
-            break;
-    }
-}
-
-function handleDonateClick(button) {
-    const campaignId = button.dataset.campaignId;
-    const modal = document.getElementById('donationModal');
-    
-    if (modal) {
-        showModal(modal);
-        setupDonationModal(campaignId);
-    }
-}
-
-function handleShareClick(button) {
-    const url = window.location.href;
-    const title = document.title;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: title,
-            url: url
-        });
-    } else {
-        // Fallback to copying to clipboard
-        navigator.clipboard.writeText(url).then(() => {
-            showNotification('Link copied to clipboard!', 'success');
-        });
-    }
-}
-
-function handleFollowClick(button) {
-    const isFollowing = button.classList.contains('following');
-    
-    if (isFollowing) {
-        button.classList.remove('following');
-        button.textContent = 'Follow';
-        showNotification('Unfollowed successfully', 'info');
-    } else {
-        button.classList.add('following');
-        button.textContent = 'Following';
-        showNotification('Followed successfully', 'success');
-    }
-}
-
-function handleLikeClick(button) {
-    const isLiked = button.classList.contains('liked');
-    const likeCount = button.querySelector('.like-count');
-    
-    if (isLiked) {
-        button.classList.remove('liked');
-        likeCount.textContent = parseInt(likeCount.textContent) - 1;
-    } else {
-        button.classList.add('liked');
-        likeCount.textContent = parseInt(likeCount.textContent) + 1;
-    }
-}
-
-// ===== MODAL HANDLING =====
-function showModal(modal) {
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    
-    // Focus first input
-    const firstInput = modal.querySelector('input, textarea, select');
-    if (firstInput) {
-        firstInput.focus();
-    }
-}
-
-function hideModal(modal) {
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-}
-
-function setupDonationModal(campaignId) {
-    const modal = document.getElementById('donationModal');
-    const amountInputs = modal.querySelectorAll('input[name="amount"]');
-    const customAmountInput = modal.querySelector('input[name="custom_amount"]');
-    
-    // Handle preset amount selection
-    amountInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            if (this.checked) {
-                customAmountInput.value = '';
-            }
-        });
-    });
-    
-    // Handle custom amount input
-    customAmountInput.addEventListener('input', function() {
-        amountInputs.forEach(input => input.checked = false);
-    });
-    
-    // Handle form submission
-    const form = modal.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const selectedAmount = modal.querySelector('input[name="amount"]:checked');
-        const customAmount = customAmountInput.value;
-        const amount = selectedAmount ? selectedAmount.value : customAmount;
-        
-        if (!amount || amount <= 0) {
-            showNotification('Please select or enter a valid amount', 'error');
-            return;
-        }
-        
-        // Process donation
-        processDonation(campaignId, amount);
-    });
-}
-
-function processDonation(campaignId, amount) {
-    showLoadingSpinner();
-    
-    // Simulate payment processing
-    setTimeout(() => {
-        hideLoadingSpinner();
-        showNotification('Donation processed successfully!', 'success');
-        
-        // Close modal
-        const modal = document.getElementById('donationModal');
-        hideModal(modal);
-        
-        // Update campaign progress
-        updateCampaignProgress(campaignId, amount);
-    }, 3000);
-}
-
-// ===== NOTIFICATIONS =====
-function showNotification(message, type = 'info', duration = 5000) {
-    const notification = createNotificationElement(message, type);
-    document.body.appendChild(notification);
-    
-    // Show notification
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    // Auto hide
-    setTimeout(() => {
-        hideNotification(notification);
-    }, duration);
-}
-
-function createNotificationElement(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    
-    const icon = getNotificationIcon(type);
-    
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="notification-icon">${icon}</i>
-            <span class="notification-message">${message}</span>
-        </div>
-        <button class="notification-close" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    return notification;
-}
-
-function getNotificationIcon(type) {
-    switch (type) {
-        case 'success': return '<i class="fas fa-check-circle"></i>';
-        case 'error': return '<i class="fas fa-exclamation-circle"></i>';
-        case 'warning': return '<i class="fas fa-exclamation-triangle"></i>';
-        case 'info': return '<i class="fas fa-info-circle"></i>';
-        default: return '<i class="fas fa-info-circle"></i>';
-    }
-}
-
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentElement) {
-            notification.parentElement.removeChild(notification);
-        }
-    }, 300);
-}
-
-// ===== LOADING SPINNER =====
-function setupLoadingSpinner() {
-    const spinner = document.getElementById('loading-spinner');
-    if (!spinner) return;
-    
-    // Hide spinner on page load
-    setTimeout(() => {
-        hideLoadingSpinner();
-    }, 1000);
-}
-
-function showLoadingSpinner() {
-    if (isLoading) return;
-    
-    isLoading = true;
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.classList.add('show');
-    }
-}
-
-function hideLoadingSpinner() {
-    isLoading = false;
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.classList.remove('show');
-    }
-}
-
-// ===== MOBILE NAVIGATION =====
-function setupMobileNavigation() {
-    const navbarToggle = document.getElementById('navbar-toggle');
-    const navbarMenu = document.getElementById('navbar-menu');
-    
-    if (!navbarToggle || !navbarMenu) return;
-    
-    navbarToggle.addEventListener('click', function() {
-        navbarMenu.classList.toggle('show');
-        
-        // Animate hamburger
-        const spans = this.querySelectorAll('span');
-        spans.forEach(span => span.classList.toggle('active'));
-    });
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!navbarToggle.contains(event.target) && !navbarMenu.contains(event.target)) {
-            navbarMenu.classList.remove('show');
-            const spans = navbarToggle.querySelectorAll('span');
-            spans.forEach(span => span.classList.remove('active'));
-        }
-    });
-}
-
-// ===== USER MENU =====
-function setupUserMenu() {
-    const userMenuToggle = document.getElementById('user-menu-toggle');
-    const userDropdown = document.getElementById('user-dropdown');
-    
-    if (!userMenuToggle || !userDropdown) return;
-    
-    userMenuToggle.addEventListener('click', function(event) {
-        event.stopPropagation();
-        userDropdown.classList.toggle('show');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!userMenuToggle.contains(event.target)) {
-            userDropdown.classList.remove('show');
-        }
-    });
-}
-
-// ===== SCROLL EFFECTS =====
-function setupScrollEffects() {
-    const elements = document.querySelectorAll('[data-animate]');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const element = entry.target;
-                const animation = element.dataset.animate;
-                element.classList.add(animation);
-                observer.unobserve(element);
-            }
-        });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    elements.forEach(element => {
-        observer.observe(element);
-    });
-}
-
-function handleScroll() {
-    const scrollTop = window.pageYOffset;
-    const backToTop = document.getElementById('back-to-top');
-    
-    if (backToTop) {
-        if (scrollTop > 300) {
-            backToTop.classList.add('show');
-        } else {
-            backToTop.classList.remove('show');
-        }
-    }
-    
-    // Parallax effects
-    const parallaxElements = document.querySelectorAll('[data-parallax]');
-    parallaxElements.forEach(element => {
-        const speed = element.dataset.parallax || 0.5;
-        const yPos = -(scrollTop * speed);
-        element.style.transform = `translateY(${yPos}px)`;
-    });
-}
-
-// ===== BACK TO TOP =====
-function setupBackToTop() {
-    const backToTop = document.getElementById('back-to-top');
-    if (!backToTop) return;
-    
-    backToTop.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-}
-
-// ===== ANIMATIONS =====
-function setupAnimations() {
-    // Add animation classes to elements
-    const animatedElements = document.querySelectorAll('.animate-on-scroll');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-fade-in');
-            }
-        });
-    });
-    
-    animatedElements.forEach(element => {
-        observer.observe(element);
-    });
-}
+let scrollPosition = 0;
 
 // ===== UTILITY FUNCTIONS =====
 function debounce(func, wait) {
@@ -596,256 +28,464 @@ function throttle(func, limit) {
     };
 }
 
-// ===== CAMPAIGN FUNCTIONS =====
-function updateCampaignProgress(campaignId, amount) {
-    const campaignCard = document.querySelector(`[data-campaign-id="${campaignId}"]`);
-    if (!campaignCard) return;
+// ===== NAVIGATION =====
+function initNavbar() {
+    const navbar = document.getElementById('mainNav');
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
     
-    const progressBar = campaignCard.querySelector('.progress-fill');
-    const currentAmount = campaignCard.querySelector('.current-amount');
-    const goalAmount = campaignCard.querySelector('.goal-amount');
-    
-    if (progressBar && currentAmount && goalAmount) {
-        const current = parseFloat(currentAmount.textContent.replace(/[^0-9.]/g, ''));
-        const goal = parseFloat(goalAmount.textContent.replace(/[^0-9.]/g, ''));
-        const newCurrent = current + parseFloat(amount);
-        
-        currentAmount.textContent = formatCurrency(newCurrent);
-        
-        const percentage = Math.min((newCurrent / goal) * 100, 100);
-        progressBar.style.width = percentage + '%';
-        
-        // Add animation
-        progressBar.classList.add('animate-progress');
-        setTimeout(() => {
-            progressBar.classList.remove('animate-progress');
-        }, 1000);
-    }
-}
-
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
-
-// ===== AUTHENTICATION =====
-function checkAuthentication() {
-    // Check if user is logged in (this would typically check cookies/session)
-    const userMenu = document.querySelector('.user-menu');
-    const authButtons = document.querySelector('.navbar-actions');
-    
-    if (userMenu && authButtons) {
-        // For demo purposes, check if user menu exists
-        if (userMenu.style.display !== 'none') {
-            currentUser = {
-                name: userMenu.querySelector('.user-name').textContent,
-                email: 'user@example.com'
-            };
+    // Navbar scroll effect
+    function handleNavbarScroll() {
+        if (window.scrollY > 100) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
         }
     }
-}
-
-// ===== UI COMPONENTS =====
-function initializeUIComponents() {
-    // Initialize tooltips
-    initializeTooltips();
     
-    // Initialize dropdowns
-    initializeDropdowns();
-    
-    // Initialize tabs
-    initializeTabs();
-    
-    // Initialize accordions
-    initializeAccordions();
-}
-
-function initializeTooltips() {
-    const tooltipElements = document.querySelectorAll('[data-tooltip]');
-    
-    tooltipElements.forEach(element => {
-        element.addEventListener('mouseenter', showTooltip);
-        element.addEventListener('mouseleave', hideTooltip);
+    // Mobile menu close on link click
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navbarCollapse.classList.contains('show')) {
+                navbarToggler.click();
+            }
+        });
     });
-}
-
-function showTooltip(event) {
-    const element = event.target;
-    const tooltipText = element.dataset.tooltip;
     
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip';
-    tooltip.textContent = tooltipText;
-    
-    document.body.appendChild(tooltip);
-    
-    const rect = element.getBoundingClientRect();
-    tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
-    tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
-    
-    element.tooltip = tooltip;
-}
-
-function hideTooltip(event) {
-    const element = event.target;
-    if (element.tooltip) {
-        element.tooltip.remove();
-        element.tooltip = null;
+    // Active link highlighting
+    function highlightActiveLink() {
+        const currentPath = window.location.pathname;
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
     }
+    
+    window.addEventListener('scroll', throttle(handleNavbarScroll, 100));
+    highlightActiveLink();
 }
 
-function initializeDropdowns() {
-    const dropdowns = document.querySelectorAll('.dropdown');
+// ===== BACK TO TOP BUTTON =====
+function initBackToTop() {
+    const backToTopBtn = document.getElementById('backToTop');
     
-    dropdowns.forEach(dropdown => {
-        const toggle = dropdown.querySelector('.dropdown-toggle');
-        const menu = dropdown.querySelector('.dropdown-menu');
-        
-        if (toggle && menu) {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                menu.classList.toggle('show');
-            });
+    function toggleBackToTop() {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    }
+    
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    window.addEventListener('scroll', throttle(toggleBackToTop, 100));
+}
+
+// ===== LOADING SPINNER =====
+function initLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    
+    function showSpinner() {
+        if (spinner) {
+            spinner.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function hideSpinner() {
+        if (spinner) {
+            spinner.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Hide spinner when page is fully loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hideSpinner);
+    } else {
+        hideSpinner();
+    }
+    
+    // Show spinner on form submissions
+    document.addEventListener('submit', (e) => {
+        if (e.target.tagName === 'FORM') {
+            showSpinner();
+        }
+    });
+    
+    // Show spinner on link clicks (for navigation)
+    document.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A' && e.target.href && !e.target.href.includes('#')) {
+            showSpinner();
         }
     });
 }
 
-function initializeTabs() {
-    const tabContainers = document.querySelectorAll('.tabs');
+// ===== PASSWORD TOGGLES =====
+function initPasswordToggles() {
+    const passwordToggles = document.querySelectorAll('.password-toggle');
     
-    tabContainers.forEach(container => {
-        const tabs = container.querySelectorAll('.tab');
-        const contents = container.querySelectorAll('.tab-content');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const target = this.dataset.target;
-                
-                // Remove active class from all tabs and contents
-                tabs.forEach(t => t.classList.remove('active'));
-                contents.forEach(c => c.classList.remove('active'));
-                
-                // Add active class to current tab and content
-                this.classList.add('active');
-                const content = container.querySelector(`[data-content="${target}"]`);
-                if (content) {
-                    content.classList.add('active');
-                }
-            });
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const input = toggle.previousElementSibling;
+            const icon = toggle.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         });
     });
 }
 
-function initializeAccordions() {
-    const accordions = document.querySelectorAll('.accordion');
+// ===== SMOOTH SCROLLING =====
+function initSmoothScrolling() {
+    const links = document.querySelectorAll('a[href^="#"]');
     
-    accordions.forEach(accordion => {
-        const header = accordion.querySelector('.accordion-header');
-        const content = accordion.querySelector('.accordion-content');
-        
-        if (header && content) {
-            header.addEventListener('click', function() {
-                const isOpen = accordion.classList.contains('open');
-                
-                // Close all accordions
-                accordions.forEach(acc => {
-                    acc.classList.remove('open');
-                    const accContent = acc.querySelector('.accordion-content');
-                    if (accContent) {
-                        accContent.style.maxHeight = null;
-                    }
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href');
+            
+            // Skip if targetId is just '#' or empty
+            if (!targetId || targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                const offsetTop = targetElement.offsetTop - 80; // Account for fixed navbar
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
                 });
-                
-                // Open current accordion if it was closed
-                if (!isOpen) {
-                    accordion.classList.add('open');
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                }
-            });
-        }
+            }
+        });
     });
 }
 
-// ===== EVENT HANDLERS =====
-function handleResize() {
-    // Handle responsive behavior
-    const isMobile = window.innerWidth <= 768;
+// ===== FORM VALIDATION =====
+function validateForm() {
+    const forms = document.querySelectorAll('.needs-validation');
     
-    if (isMobile) {
-        document.body.classList.add('mobile');
-    } else {
-        document.body.classList.remove('mobile');
-    }
-}
-
-function handleBeforeUnload(event) {
-    // Save any unsaved form data
-    const forms = document.querySelectorAll('form');
     forms.forEach(form => {
-        if (form.dataset.autoSave) {
-            saveFormData(form);
+        form.addEventListener('submit', (e) => {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+}
+
+// ===== ANIMATIONS =====
+function initAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-in-up');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    // Observe elements with animation classes
+    const animatedElements = document.querySelectorAll('.animate-fade-in-up, .animate-slide-in-left, .animate-slide-in-right');
+    animatedElements.forEach(el => observer.observe(el));
+}
+
+// ===== CAMPAIGN CARDS =====
+function initCampaignCards() {
+    const campaignCards = document.querySelectorAll('.campaign-card');
+    
+    campaignCards.forEach(card => {
+        // Hover effect
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+        
+        // Progress bar animation
+        const progressBar = card.querySelector('.progress-bar');
+        if (progressBar) {
+            const width = progressBar.style.width;
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.width = width;
+            }, 300);
         }
     });
 }
 
-function saveFormData(form) {
-    const formData = new FormData(form);
-    const data = {};
+// ===== DONATION FORM =====
+function initDonationForm() {
+    const donationForm = document.getElementById('donationForm');
+    const amountInput = document.getElementById('amount');
+    const quickAmountButtons = document.querySelectorAll('.quick-amount');
     
-    for (let [key, value] of formData.entries()) {
-        data[key] = value;
-    }
-    
-    localStorage.setItem(`form_${form.dataset.formType}`, JSON.stringify(data));
-}
-
-function loadFormData(form) {
-    const saved = localStorage.getItem(`form_${form.dataset.formType}`);
-    if (saved) {
-        const data = JSON.parse(saved);
-        Object.keys(data).forEach(key => {
-            const input = form.querySelector(`[name="${key}"]`);
-            if (input) {
-                input.value = data[key];
+    if (donationForm && amountInput) {
+        // Quick amount buttons
+        quickAmountButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const amount = button.dataset.amount;
+                amountInput.value = amount;
+                
+                // Update active state
+                quickAmountButtons.forEach(btn => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+                button.classList.remove('btn-outline-primary');
+                button.classList.add('active', 'btn-primary');
+            });
+        });
+        
+        // Real-time validation
+        amountInput.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            const submitBtn = donationForm.querySelector('button[type="submit"]');
+            
+            if (value && value > 0) {
+                submitBtn.disabled = false;
+                amountInput.classList.remove('is-invalid');
+                amountInput.classList.add('is-valid');
+            } else {
+                submitBtn.disabled = true;
+                amountInput.classList.remove('is-valid');
+                amountInput.classList.add('is-invalid');
             }
         });
     }
 }
 
-// ===== EXPORT FUNCTIONS =====
-window.GiveGrip = {
-    showNotification,
-    showLoadingSpinner,
-    hideLoadingSpinner,
-    showModal,
-    hideModal,
-    formatCurrency,
-    updateCampaignProgress
-};
-
-// ===== PERFORMANCE OPTIMIZATION =====
-// Throttle scroll events
-const throttledScroll = throttle(handleScroll, 16);
-window.addEventListener('scroll', throttledScroll);
-
-// Debounce resize events
-const debouncedResize = debounce(handleResize, 250);
-window.addEventListener('resize', debouncedResize);
-
-// ===== SERVICE WORKER REGISTRATION =====
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-                console.log('SW registered: ', registration);
-            })
-            .catch(function(registrationError) {
-                console.log('SW registration failed: ', registrationError);
-            });
+// ===== SHARE FUNCTIONALITY =====
+function initShareButtons() {
+    const shareButtons = document.querySelectorAll('[data-share]');
+    
+    shareButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const platform = button.dataset.share;
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            
+            let shareUrl = '';
+            
+            switch (platform) {
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${title}%20${url}`;
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        showToast('Link copied to clipboard!', 'success');
+                    });
+                    return;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            }
+        });
     });
 }
+
+// ===== TOAST NOTIFICATIONS =====
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove toast element after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+}
+
+// ===== SEARCH FUNCTIONALITY =====
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    
+    if (searchInput) {
+        const debouncedSearch = debounce(async (query) => {
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/search/?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    displaySearchResults(data.results);
+                } else {
+                    searchResults.innerHTML = '<div class="p-3 text-muted">No results found</div>';
+                }
+                searchResults.style.display = 'block';
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }, 300);
+        
+        searchInput.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+        });
+        
+        // Hide results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+    }
+}
+
+function displaySearchResults(results) {
+    const searchResults = document.getElementById('searchResults');
+    
+    searchResults.innerHTML = results.map(result => `
+        <a href="${result.url}" class="dropdown-item">
+            <div class="d-flex align-items-center">
+                <img src="${result.image || '/static/images/default-campaign.jpg'}" 
+                     alt="${result.title}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                <div>
+                    <div class="fw-bold">${result.title}</div>
+                    <small class="text-muted">${result.description}</small>
+                </div>
+            </div>
+        </a>
+    `).join('');
+}
+
+// ===== RESPONSIVE HANDLING =====
+function handleResize() {
+    const isMobile = window.innerWidth < 768;
+    
+    // Adjust navbar for mobile
+    const navbar = document.getElementById('mainNav');
+    if (navbar) {
+        if (isMobile) {
+            navbar.classList.add('mobile');
+        } else {
+            navbar.classList.remove('mobile');
+        }
+    }
+    
+    // Adjust card layouts
+    const campaignCards = document.querySelectorAll('.campaign-card');
+    campaignCards.forEach(card => {
+        if (isMobile) {
+            card.classList.add('mobile-layout');
+        } else {
+            card.classList.remove('mobile-layout');
+        }
+    });
+}
+
+const debouncedResize = debounce(handleResize, 250);
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    initNavbar();
+    initBackToTop();
+    initLoadingSpinner();
+    initPasswordToggles();
+    initSmoothScrolling();
+    validateForm();
+    initAnimations();
+    initCampaignCards();
+    initDonationForm();
+    initShareButtons();
+    initSearch();
+    handleResize();
+    
+    // Event listeners
+    window.addEventListener('resize', debouncedResize);
+    
+    // Global error handling
+    window.addEventListener('error', (e) => {
+        console.error('Global error:', e.error);
+        showToast('Something went wrong. Please try again.', 'danger');
+    });
+    
+    // Handle AJAX errors
+    document.addEventListener('ajax:error', (e) => {
+        showToast('Request failed. Please try again.', 'danger');
+    });
+});
+
+// ===== EXPORT FUNCTIONS FOR GLOBAL USE =====
+window.GiveGrip = {
+    showToast,
+    initSearch,
+    shareCampaign: function(title, text, url) {
+        if (navigator.share) {
+            navigator.share({ title, text, url });
+        } else {
+            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            window.open(shareUrl, '_blank');
+        }
+    }
+};
 
 
 

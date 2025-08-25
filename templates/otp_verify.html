@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify OTP - GiveGrip{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Verify Your Phone</h1>
+            <p>Enter the 6-digit code sent to your phone</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" class="form-control" 
+                       placeholder="Enter your phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="otp">Verification Code</label>
+                <div class="otp-inputs">
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" required>
+                </div>
+                <small class="form-text text-muted">
+                    Enter the 6-digit code sent to your phone
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">Verify Code</button>
+        </form>
+
+        <div class="otp-timer text-center mt-3">
+            <p class="text-muted">Didn't receive the code?</p>
+            <button type="button" class="btn btn-link" id="resendOTP">Resend Code</button>
+        </div>
+
+        <div class="auth-footer">
+            <p>Back to <a href="{% url 'accounts:login' %}" class="link-primary">login</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus next OTP input
+document.querySelectorAll('.otp-input').forEach((input, index) => {
+    input.addEventListener('input', function() {
+        if (this.value.length === 1 && index < 5) {
+            document.querySelectorAll('.otp-input')[index + 1].focus();
+        }
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+            document.querySelectorAll('.otp-input')[index - 1].focus();
+        }
+    });
+});
+
+// Combine OTP inputs into hidden field before form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    let otp = '';
+    otpInputs.forEach(input => {
+        otp += input.value;
+    });
+    
+    // Create hidden input for OTP
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'otp';
+    hiddenInput.value = otp;
+    this.appendChild(hiddenInput);
+});
+</script>
+
+<style>
+.otp-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.otp-input {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    height: 3rem;
+}
+</style>
+{% endblock %}
+
+
