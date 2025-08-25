@@ -364,7 +364,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ by the GiveGrip Team**
+**Made with ❤️ by the MetaVolt Productions**
 
 [![GitHub stars](https://img.shields.io/github/stars/Vijayapardhu/GiveGrip?style=social)](https://github.com/Vijayapardhu/GiveGrip/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Vijayapardhu/GiveGrip?style=social)](https://github.com/Vijayapardhu/GiveGrip/network)
